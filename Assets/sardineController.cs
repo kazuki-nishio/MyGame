@@ -18,15 +18,25 @@ public class sardineController : MonoBehaviour
     private float coefficient = 0.99f;
     //ゲームオーバーの判定
     private bool isEnd = false;
+    //FieldCheckPointPefabをいれる
+    public GameObject FieldCheckPointPefab;
+    //フィールドの生成範囲
+    private float fieldStart = 70f;
+    private float fieldEnd = 160f;
 
     // Start is called before the first frame update
     void Start()
     {
         //sardineのrigidbodyコンポーネントを取得
         this.myRigidBody = GetComponent<Rigidbody>();
-
         //sardineのAnimationコンポーネントを取得
         this.myAnimator = GetComponent<Animator>();
+        //海生成用チェックポイントを作成
+        for (float i = fieldStart; i < fieldEnd; i += 70f)
+        {
+            GameObject FieldCheckPoint = Instantiate(FieldCheckPointPefab);
+            FieldCheckPoint.transform.position = new Vector3(0, FieldCheckPoint.transform.position.y, i);
+        }
     }
 
     // Update is called once per frame
