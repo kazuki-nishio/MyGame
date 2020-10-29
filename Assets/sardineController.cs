@@ -31,12 +31,6 @@ public class sardineController : MonoBehaviour
         this.myRigidBody = GetComponent<Rigidbody>();
         //sardineのAnimationコンポーネントを取得
         this.myAnimator = GetComponent<Animator>();
-        //海生成用チェックポイントを作成
-        for (float i = fieldStart; i < fieldEnd; i += 70f)
-        {
-            GameObject FieldCheckPoint = Instantiate(FieldCheckPointPefab);
-            FieldCheckPoint.transform.position = new Vector3(0, FieldCheckPoint.transform.position.y, i);
-        }
     }
 
     // Update is called once per frame
@@ -73,5 +67,10 @@ public class sardineController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         this.isEnd = true;
+        //FieldCheckPointの場合は素通り
+        if(other.gameObject.tag== "FieldCheckPointTag")
+        {
+            this.isEnd = false;
+        }
     }
 }
