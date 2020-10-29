@@ -20,9 +20,6 @@ public class sardineController : MonoBehaviour
     private bool isEnd = false;
     //FieldCheckPointPefabをいれる
     public GameObject FieldCheckPointPefab;
-    //フィールドの生成範囲
-    private float fieldStart = 70f;
-    private float fieldEnd = 160f;
 
     // Start is called before the first frame update
     void Start()
