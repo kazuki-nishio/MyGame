@@ -18,8 +18,7 @@ public class sardineController : MonoBehaviour
     private float coefficient = 0.99f;
     //ゲームオーバーの判定
     private bool isEnd = false;
-    //FieldCheckPointPefabをいれる
-    public GameObject FieldCheckPointPefab;
+ 
 
     // Start is called before the first frame update
     void Start()
@@ -64,10 +63,5 @@ public class sardineController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         this.isEnd = true;
-        //FieldCheckPointの場合は素通り
-        if(other.gameObject.tag== "FieldCheckPointTag")
-        {
-            this.isEnd = false;
-        }
     }
 }
