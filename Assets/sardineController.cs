@@ -27,7 +27,7 @@ public class sardineController : MonoBehaviour
     private bool isEnd = false;
     //ゴールした際に表示するテキスト
     private GameObject goalText;
-
+    Collider m_collider = null;
 
     // Start is called before the first frame update
     void Start()
@@ -42,6 +42,7 @@ public class sardineController : MonoBehaviour
         firstAnimator = this.myAnimator.speed;
         //GoalTextオブジェクトを取得
         this.goalText = GameObject.Find("GoalText");
+        m_collider = GetComponent<Collider>();
     }
 
     // Update is called once per frame
@@ -88,6 +89,8 @@ public class sardineController : MonoBehaviour
         {
             this.myAnimator.speed = firstAnimator;
             this.velocityZ = firstVelocityZ;
+            m_collider.enabled = false;
+            Invoke("EnableCollider", 1f);
         }
         //ゴールに到着するとゲーム終了
         if(other.gameObject.tag == "GoalTag")
@@ -95,5 +98,10 @@ public class sardineController : MonoBehaviour
             this.isEnd = true;
             goalText.GetComponent<Text>().text = "GOAL!!";
         }
+    }
+
+    private void EnableCollider()
+    {
+        m_collider.enabled = true;
     }
 }
