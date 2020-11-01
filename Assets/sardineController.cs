@@ -90,6 +90,7 @@ public class sardineController : MonoBehaviour
             this.myAnimator.speed = firstAnimator;
             this.velocityZ = firstVelocityZ;
             m_collider.enabled = false;
+            this.myAnimator.Play("Invincible");
             Invoke("EnableCollider", 1f);
         }
         //ゴールに到着するとゲーム終了
