@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class sardineController : MonoBehaviour
@@ -8,17 +9,25 @@ public class sardineController : MonoBehaviour
     private Rigidbody myRigidBody;
     //アニメーションするためのコンポーネントを入れる
     private Animator myAnimator;
+    //ゲーム開始時のアニメーションのスピード
+    private float firstAnimator;
     //前方向の速度
-    private float velocityZ = 16f;
+    private float velocityZ = 15f;
+    //ゲーム開始時の前方向の速度
+    private float firstVelocityZ;
     //横方向の速度
     private float velocityX = 10f;
     //横方向の移動範囲
     private float moveX = 4f;
     //減速させる係数
     private float coefficient = 0.99f;
+    //前方向の速度の上昇限界値
+    float maxSpeed = 50f;
     //ゲームオーバーの判定
     private bool isEnd = false;
- 
+    //ゴールした際に表示するテキスト
+    private GameObject goalText;
+
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +36,12 @@ public class sardineController : MonoBehaviour
         this.myRigidBody = GetComponent<Rigidbody>();
         //sardineのAnimationコンポーネントを取得
         this.myAnimator = GetComponent<Animator>();
+        //ゲーム開始時の前方向の速度を初期化
+        firstVelocityZ = velocityZ;
+        //ゲーム開始時のアニメーションのスピードを初期化
+        firstAnimator = this.myAnimator.speed;
+        //GoalTextオブジェクトを取得
+        this.goalText = GameObject.Find("GoalText");
     }
 
     // Update is called once per frame
@@ -44,7 +59,7 @@ public class sardineController : MonoBehaviour
         {
             InputVelocityX = this.moveX;
         }
-        //ゲームオーバー時に減速
+        //クリア時に減速
         if (this.isEnd)
         {
             this.velocityX *= coefficient;
@@ -62,6 +77,23 @@ public class sardineController : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        this.isEnd = true;
+        //SpeedUpに触れると速度を上昇させる
+        if (other.gameObject.tag == "SpeedUpTag" && this.velocityZ < maxSpeed)
+        {
+            this.myAnimator.speed += 0.2f;
+            this.velocityZ += 20f;
+        }
+        //障害物に触れると速度の上昇値をリセットする
+        if(other.gameObject.tag == "ObstacleTag")
+        {
+            this.myAnimator.speed = firstAnimator;
+            this.velocityZ = firstVelocityZ;
+        }
+        //ゴールに到着するとゲーム終了
+        if(other.gameObject.tag == "GoalTag")
+        {
+            this.isEnd = true;
+            goalText.GetComponent<Text>().text = "GOAL!!";
+        }
     }
 }
