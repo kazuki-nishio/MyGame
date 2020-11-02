@@ -27,7 +27,14 @@ public class sardineController : MonoBehaviour
     private bool isEnd = false;
     //ゴールした際に表示するテキスト
     private GameObject goalText;
+    //コリダーを入れる
     Collider m_collider = null;
+    //ゴールオブジェクトを入れる
+    private GameObject goal;
+    //ゴールまでの距離を表示するテキスト
+    private GameObject distanceText;
+    //ゴールまでの距離
+    private float toGoal;
 
     // Start is called before the first frame update
     void Start()
@@ -42,12 +49,24 @@ public class sardineController : MonoBehaviour
         firstAnimator = this.myAnimator.speed;
         //GoalTextオブジェクトを取得
         this.goalText = GameObject.Find("GoalText");
+        //コリダーコンポーネントを取得
         m_collider = GetComponent<Collider>();
+        //ゴールオブジェクトを取得
+        this.goal = GameObject.Find("Goal");
+        //distanceTextを取得
+        this.distanceText = GameObject.Find("DistanceText");
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(0<=toGoal)
+        {
+            //プレーヤーとゴールまでの位置を計算
+            this.toGoal = goal.transform.position.z - this.transform.position.z;
+            //ゴールまでの距離をDistanceTextに表示
+            distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
+        } 
         //x軸方向の速度を初期化
         float InputVelocityX = 0;
         //左矢印が押されたら左方向の速度を代入
@@ -76,6 +95,7 @@ public class sardineController : MonoBehaviour
         //Sardineの速度を設定
         this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
     }
+
     private void OnTriggerEnter(Collider other)
     {
         //SpeedUpに触れると速度を上昇させる
@@ -85,22 +105,25 @@ public class sardineController : MonoBehaviour
             this.velocityZ += 20f;
         }
         //障害物に触れると速度の上昇値をリセットする
-        if(other.gameObject.tag == "ObstacleTag")
+        if (other.gameObject.tag == "ObstacleTag")
         {
             this.myAnimator.speed = firstAnimator;
             this.velocityZ = firstVelocityZ;
+            //コリダーを無効化する
             m_collider.enabled = false;
+            //オブジェクトを点滅させる
             this.myAnimator.Play("Invincible");
+            //衝突から1秒後にコリダーを有効にする
             Invoke("EnableCollider", 1f);
         }
         //ゴールに到着するとゲーム終了
-        if(other.gameObject.tag == "GoalTag")
+        if (other.gameObject.tag == "GoalTag")
         {
             this.isEnd = true;
             goalText.GetComponent<Text>().text = "GOAL!!";
         }
     }
-
+    //コリダーを有効にする
     private void EnableCollider()
     {
         m_collider.enabled = true;
