@@ -53,7 +53,7 @@ public class sardineController : MonoBehaviour
         m_collider = GetComponent<Collider>();
         //ゴールオブジェクトを取得
         this.goal = GameObject.Find("Goal");
-        //distanceTextを取得
+        //DistanceTextを取得
         this.distanceText = GameObject.Find("DistanceText");
     }
 
@@ -121,6 +121,8 @@ public class sardineController : MonoBehaviour
         {
             this.isEnd = true;
             goalText.GetComponent<Text>().text = "GOAL!!";
+            //タイマーを止める
+            GameObject.Find("TimerText").GetComponent<TimerController>().PlayerGoal();
         }
     }
     //コリダーを有効にする
