@@ -18,7 +18,7 @@ public class sardineController : MonoBehaviour
     //横方向の速度
     private float velocityX = 10f;
     //横方向の移動範囲
-    private float moveX = 4f;
+    private float moveX = 3f;
     //減速させる係数
     private float coefficient = 0.99f;
     //前方向の速度の上昇限界値
@@ -35,6 +35,7 @@ public class sardineController : MonoBehaviour
     private GameObject distanceText;
     //ゴールまでの距離
     private float toGoal;
+   
 
     // Start is called before the first frame update
     void Start()
@@ -60,13 +61,13 @@ public class sardineController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(0<=toGoal)
+        if (0 <= toGoal)
         {
             //プレーヤーとゴールまでの位置を計算
             this.toGoal = goal.transform.position.z - this.transform.position.z;
             //ゴールまでの距離をDistanceTextに表示
             distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
-        } 
+        }
         //x軸方向の速度を初期化
         float InputVelocityX = 0;
         //左矢印が押されたら左方向の速度を代入
