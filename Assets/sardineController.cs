@@ -103,7 +103,7 @@ public class sardineController : MonoBehaviour
         if (other.gameObject.tag == "SpeedUpTag" && this.velocityZ < maxSpeed)
         {
             this.myAnimator.speed += 0.2f;
-            this.velocityZ += 20f;
+            this.velocityZ += 8f;
         }
         //障害物に触れると速度の上昇値をリセットする
         if (other.gameObject.tag == "ObstacleTag")

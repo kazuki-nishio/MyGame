@@ -51,24 +51,19 @@ public class ObjectController : MonoBehaviour
         }
         //lastTimeGenerateItemPositionZをプレイヤーの初期位置で初期化
         lastTimeGenerateItemPositionZ = m_player.transform.position.z;
-        //障害物を100m先まで生成
+        //障害物をプレーヤーの前方80m先まで生成
         for (float i = m_player.transform.position.z + 20f; i <= m_player.transform.position.z + itemGenerateRange; i += interval)
         {
-            int num = Random.Range(1, 4);
+            int num = Random.Range(1, 7);
             //移動速度の異なるキューブをランダムに生成
-            if (num == 1)
+            if (num <=3)
             {
                 GameObject cube = Instantiate(cubePrefab_Low);
                 cube.transform.position = new Vector3(-3, cube.transform.position.y, i);
             }
-            if (num == 2)
+            if (4 <= num && num <= 5)
             {
                 GameObject cube = Instantiate(cubePrefab_Middle);
-                cube.transform.position = new Vector3(-3, cube.transform.position.y, i);
-            }
-            if (num == 3)
-            {
-                GameObject cube = Instantiate(cubePrefab_High);
                 cube.transform.position = new Vector3(-3, cube.transform.position.y, i);
             }
             //SpeedUpを生成
@@ -101,35 +96,77 @@ public class ObjectController : MonoBehaviour
         //プレイヤーがアイテムの生成間隔分だけ前進したら、アイテムを生成する(ゴール以降には生成しない)
         if (lastTimeGenerateItemPositionZ + interval < m_player.transform.position.z && m_player.transform.position.z + itemGenerateRange < goal.transform.position.z)
         {
-            int num = Random.Range(1, 4);
-            //移動速度の異なるキューブをランダムに生成
-            if (num == 1)
+            //それぞれの障害物の生成確立
+            int num = Random.Range(1, 8);
+            //各レーンのSpeedUpの生成確率
+            int speedUpGenerationRate;
+            //生成されるSpeedUpのZ軸方向のオフセット
+            int offSetZ;
+            //コースの60%までは高速キューブを生成しない
+            if (m_player.transform.position.z + itemGenerateRange < goal.transform.position.z * 0.6)
             {
-                GameObject cube = Instantiate(cubePrefab_Low);
-                cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
-            }
-            if (num == 2)
-            {
-                GameObject cube = Instantiate(cubePrefab_Middle);
-                cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
-            }
-            if (num == 3)
-            {
-                GameObject cube = Instantiate(cubePrefab_High);
-                cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
-            }
-            //SpeedUpを生成
-            for (int j = -1; j <= 1; j++)
-            {
-                //各レーンのSpeedUpを確率で生成
-                int speedUpGenerationRate = Random.Range(1, 5);
-                //50%の確立でSpeedUpを生成
-                if (speedUpGenerationRate <= 2)
+                //移動速度の異なるキューブをランダムに生成
+                if (num <= 3)
                 {
-                    //生成されるアイテムのZ軸方向のオフセット
-                    int offSetZ = Random.Range(-5, 6);
-                    GameObject sppedUp = Instantiate(speedUpPrefab);
-                    sppedUp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + offSetZ);
+                    GameObject cube = Instantiate(cubePrefab_Low);
+                    cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
+                }
+                if (4 <= num && num <= 5)
+                {
+                    GameObject cube = Instantiate(cubePrefab_Middle);
+                    cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
+                }
+                //SpeedUpを生成
+                for (int j = -1; j <= 1; j++)
+                {
+                    speedUpGenerationRate = Random.Range(1, 5);
+                    offSetZ = Random.Range(-5, 6);
+                    //50%の確立でSpeedUpを生成
+                    if (speedUpGenerationRate <= 2)
+                    {
+                        GameObject sppedUp = Instantiate(speedUpPrefab);
+                        sppedUp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + offSetZ);
+                    }
+                }
+            }
+            //コースの60%～80%まで高速の障害物を含め生成
+            if (goal.transform.position.z * 0.6 <= m_player.transform.position.z + itemGenerateRange && m_player.transform.position.z + itemGenerateRange < goal.transform.position.z * 0.8)
+            {
+                if (num <= 2)
+                {
+                    GameObject cube = Instantiate(cubePrefab_Low);
+                    cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
+                }
+                if (3 <= num && num <= 5)
+                {
+                    GameObject cube = Instantiate(cubePrefab_Middle);
+                    cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
+                }
+                if (6 <= num && num <= 7)
+                {
+                    GameObject cube = Instantiate(cubePrefab_High);
+                    cube.transform.position = new Vector3(-3, cube.transform.position.y, m_player.transform.position.z + itemGenerateRange);
+                }
+                //SpeedUpを生成
+                for (int j = -1; j <= 1; j++)
+                {
+                    speedUpGenerationRate = Random.Range(1, 5);
+                    offSetZ = Random.Range(-5, 6);
+                    //50%の確立でSpeedUpを生成
+                    if (speedUpGenerationRate <= 2)
+                    {
+                        GameObject sppedUp = Instantiate(speedUpPrefab);
+                        sppedUp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + offSetZ);
+                    }
+                }
+            }
+            //コースの80%～ゴールまではSpeedUpのみ生成
+            if (goal.transform.position.z * 0.8 <= m_player.transform.position.z + itemGenerateRange)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                        GameObject sppedUp = Instantiate(speedUpPrefab);
+                        sppedUp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange);
                 }
             }
             lastTimeGenerateItemPositionZ = m_player.transform.position.z;
