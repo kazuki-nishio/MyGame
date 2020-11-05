@@ -8,20 +8,42 @@ public class TimerController : MonoBehaviour
     private float second = 0f;
     //タイマーをオフにする
     private bool isGoal=false;
-
+    //ベストタイム用の変数
+    private float bestTime;
+    //スコアの記録のON/OFF
+    bool isScoreRecorded;
+    //bestTimeTextを参照
+    public UnityEngine.UI.Text bestTimeText;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        //RecordedTimeに保存された値を bestTimeTextに表示
+        float recordedTime = PlayerPrefs.GetFloat("RecordedTime");
+        bestTime = recordedTime;
+        if(recordedTime > 0)
+        {
+            bestTimeText.text ="Best:"+ recordedTime.ToString("F2")+"sec";
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //ゴール後は処理を行わないようにする
+        //ゴール後の処理
         if(isGoal)
         {
+            //RecordedTimeに経過時間を保存
+            if (!isScoreRecorded)
+            {
+                //スコアがよければbestTimeを更新
+                if(second < bestTime)
+                {
+                    PlayerPrefs.SetFloat("RecordedTime", second);
+                }
+                //経過時間の計測をやめる
+                isScoreRecorded = true;
+            }
             return;
         }
         //ゲーム開始からの経過時間を計算
