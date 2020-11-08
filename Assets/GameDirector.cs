@@ -27,11 +27,14 @@ public class GameDirector : MonoBehaviour
     private GameObject distanceText;
     //ゴールまでの距離
     private float toGoal;
+    //DistanceGageを入れる
+    public Slider distanceGage;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        distanceGage.value = 0;
         //プレイヤーオブジェクトを取得
         this.player = GameObject.Find("Sardine");
         //ゴールオブジェクトを取得
@@ -43,7 +46,7 @@ public class GameDirector : MonoBehaviour
         //Timertextを取得
         this.timerText = GameObject.Find("TimerText");
         //RecordedTimeに保存された値を bestTimeTextに表示
-        if(PlayerPrefs.HasKey("RecordedTime"))
+        if (PlayerPrefs.HasKey("RecordedTime"))
         {
             float recordedTime = PlayerPrefs.GetFloat("RecordedTime");
             bestTime = recordedTime;
@@ -52,16 +55,18 @@ public class GameDirector : MonoBehaviour
                 bestTimeText.text = "Best:" + recordedTime.ToString("F2") + "sec";
             }
         }
-       
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        //プレーヤーとゴールまでの位置を計算
+        this.toGoal = goal.transform.position.z - player.transform.position.z;
+        //プレーヤーの進行度をゲージに表示
+        distanceGage.value = player.transform.position.z / goal.transform.position.z;
         if (0 <= toGoal)
         {
-            //プレーヤーとゴールまでの位置を計算
-            this.toGoal = goal.transform.position.z - player.transform.position.z;
             //ゴールまでの距離をDistanceTextに表示
             distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
         }
@@ -90,7 +95,7 @@ public class GameDirector : MonoBehaviour
         //ゲーム開始からの経過時間を計算
         second += Time.deltaTime;
         //経過時間を表示
-        timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";    
+        timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";
     }
 
     //プレーヤーがゴールしたことを判定する
