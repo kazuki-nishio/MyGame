@@ -25,17 +25,8 @@ public class sardineController : MonoBehaviour
     float maxSpeed = 50f;
     //ゲームオーバーの判定
     private bool isEnd = false;
-    //ゴールした際に表示するテキスト
-    private GameObject goalText;
     //コリダーを入れる
     Collider m_collider = null;
-    //ゴールオブジェクトを入れる
-    private GameObject goal;
-    //ゴールまでの距離を表示するテキスト
-    private GameObject distanceText;
-    //ゴールまでの距離
-    private float toGoal;
-   
 
     // Start is called before the first frame update
     void Start()
@@ -48,26 +39,13 @@ public class sardineController : MonoBehaviour
         firstVelocityZ = velocityZ;
         //ゲーム開始時のアニメーションのスピードを初期化
         firstAnimator = this.myAnimator.speed;
-        //GoalTextオブジェクトを取得
-        this.goalText = GameObject.Find("GoalText");
         //コリダーコンポーネントを取得
         m_collider = GetComponent<Collider>();
-        //ゴールオブジェクトを取得
-        this.goal = GameObject.Find("Goal");
-        //DistanceTextを取得
-        this.distanceText = GameObject.Find("DistanceText");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (0 <= toGoal)
-        {
-            //プレーヤーとゴールまでの位置を計算
-            this.toGoal = goal.transform.position.z - this.transform.position.z;
-            //ゴールまでの距離をDistanceTextに表示
-            distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
-        }
         //x軸方向の速度を初期化
         float InputVelocityX = 0;
         //左矢印が押されたら左方向の速度を代入
@@ -121,9 +99,8 @@ public class sardineController : MonoBehaviour
         if (other.gameObject.tag == "GoalTag")
         {
             this.isEnd = true;
-            goalText.GetComponent<Text>().text = "GOAL!!";
             //タイマーを止める
-            GameObject.Find("TimerText").GetComponent<TimerController>().PlayerGoal();
+            GameObject.Find("GameDirector").GetComponent<GameDirector>().PlayerGoal();
         }
     }
     //コリダーを有効にする
