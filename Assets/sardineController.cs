@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine;
 
@@ -64,12 +63,6 @@ public class sardineController : MonoBehaviour
             this.velocityX *= coefficient;
             this.velocityZ *= coefficient;
             this.myAnimator.speed *= coefficient;
-            //マウスのボタンが押されたら最初のシーンに戻る
-            if (Input.GetMouseButtonDown(0))
-            {
-                //SampleSceneを読み込む
-                SceneManager.LoadScene("SampleScene");
-            }
         }
         //Sardineの速度を設定
         this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
@@ -98,8 +91,8 @@ public class sardineController : MonoBehaviour
         //ゴールに到着するとゲーム終了
         if (other.gameObject.tag == "GoalTag")
         {
-            this.isEnd = true;
-            //タイマーを止める
+            isEnd = true;
+            //isGoalをtrueにする
             GameObject.Find("GameDirector").GetComponent<GameDirector>().PlayerGoal();
         }
     }

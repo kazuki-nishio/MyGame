@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameDirector : MonoBehaviour
 {
@@ -78,12 +79,18 @@ public class GameDirector : MonoBehaviour
                 //経過時間の計測をやめる
                 isScoreRecorded = true;
             }
+            //マウスのボタンが押されたら最初のシーンに戻る
+            if (Input.GetMouseButtonDown(0))
+            {
+                //SampleSceneを読み込む
+                SceneManager.LoadScene("SampleScene");
+            }
             return;
         }
         //ゲーム開始からの経過時間を計算
         second += Time.deltaTime;
         //経過時間を表示
-        timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";
+        timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";    
     }
 
     //プレーヤーがゴールしたことを判定する
