@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine.UI;
 using UnityEngine;
+using TMPro;
+using System;
 
 public class sardineController : MonoBehaviour
 {
@@ -10,8 +12,10 @@ public class sardineController : MonoBehaviour
     private Animator myAnimator;
     //ゲーム開始時のアニメーションのスピード
     private float firstAnimator;
-    //前方向の速度
-    private float velocityZ = 15f;
+    //通常時の前方向の速度
+    public float velocityZ = 15f;
+    //無敵状態の時の前方向の速度
+    public float invincibleVelocityZ = 50f;
     //ゲーム開始時の前方向の速度
     private float firstVelocityZ;
     //横方向の速度
@@ -24,6 +28,18 @@ public class sardineController : MonoBehaviour
     float maxSpeed = 50f;
     //ゲームオーバーの判定
     private bool isEnd = false;
+    //無敵状態の判定
+    private bool isInvincible = false;
+    //スコアを入れる
+    public float score = 0;
+    //通常時の金のエビのスコア
+    public float goldShrimpScore = 50f;
+    //通常時の赤いエビのスコア
+    public float redShrimpScore = 10f;
+    //無敵状態の金のエビのスコア
+    private float invincibleGoldShrimpScore;
+    //無敵状態の赤のエビのスコア
+    private float invincibleRedShrimpScore;
     //コリダーを入れる
     Collider m_collider = null;
 
@@ -40,6 +56,10 @@ public class sardineController : MonoBehaviour
         firstAnimator = this.myAnimator.speed;
         //コリダーコンポーネントを取得
         m_collider = GetComponent<Collider>();
+        //無敵状態の金のエビのスコア
+        invincibleGoldShrimpScore = goldShrimpScore * 1.1f;
+        //無敵状態の赤のエビのスコア
+        invincibleRedShrimpScore = redShrimpScore * 1.1f;
     }
 
     // Update is called once per frame
@@ -63,24 +83,71 @@ public class sardineController : MonoBehaviour
             this.velocityX *= coefficient;
             this.velocityZ *= coefficient;
             this.myAnimator.speed *= coefficient;
+        }   
+        //無敵状態のときは速度を上昇
+        if(isInvincible)
+        {
+            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.invincibleVelocityZ);
         }
-        //Sardineの速度を設定
-        this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
+        else
+        {
+            //Sardineの速度を設定
+            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
+            
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        //SpeedUpに触れると速度を上昇させる
-        if (other.gameObject.tag == "SpeedUpTag" && this.velocityZ < maxSpeed)
+        //非無敵状態での処理
+        if(!isInvincible)
         {
-            this.myAnimator.speed += 0.2f;
-            this.velocityZ += 8f;
+            //金のエビに触れると無敵状態へ移行
+            if (other.gameObject.tag == "InvincibleTag")
+            {
+                isInvincible = true;
+                this.myAnimator.speed += 0.6f;
+                //得点を取得
+                score += goldShrimpScore;
+                //5秒後に解除
+                Invoke("UnInvincible", 5f);
+            }
+            //赤いエビに触れると得点を獲得し一定時間速度を上昇させる
+            if (other.gameObject.tag == "NormalItemTag")
+            {
+                score += redShrimpScore;
+                if(velocityZ<maxSpeed)
+                {
+                    this.myAnimator.speed += 0.3f;
+                    this.velocityZ += 10f;
+                    Debug.Log(velocityZ);
+                    Invoke("ResetSpeed", 0.8f);
+                }   
+            }
         }
-        //障害物に触れると速度の上昇値をリセットする
-        if (other.gameObject.tag == "ObstacleTag")
+        //無敵時の処理
+       else if(isInvincible)
         {
-            this.myAnimator.speed = firstAnimator;
-            this.velocityZ = firstVelocityZ;
+            //獲得得点を上昇
+            if (other.gameObject.tag == "InvincibleTag")
+            {
+                score += invincibleGoldShrimpScore;
+            }
+            //獲得得点を上昇
+            if (other.gameObject.tag == "NormalItemTag")
+            {
+                score += invincibleRedShrimpScore;
+            }
+            //無敵状態で障害物に触れると障害物を破壊
+            if (other.gameObject.tag == "ObstacleTag" && isInvincible)
+            {
+                Destroy(other.gameObject);
+            }
+        }
+        
+        //障害物に触れたときの処理
+        if (other.gameObject.tag == "ObstacleTag")
+        {        
             //コリダーを無効化する
             m_collider.enabled = false;
             //オブジェクトを点滅させる
@@ -100,5 +167,17 @@ public class sardineController : MonoBehaviour
     private void EnableCollider()
     {
         m_collider.enabled = true;
+    }
+    //無敵状態を解除
+    private void UnInvincible()
+    {
+        isInvincible = false;
+        this.myAnimator.speed = firstAnimator;
+    }
+    //赤いエビによって上昇した速度をリセット
+    private void ResetSpeed()
+    {
+        this.myAnimator.speed = firstAnimator;
+        this.velocityZ = firstVelocityZ;
     }
 }
