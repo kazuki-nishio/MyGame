@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameDirector : MonoBehaviour
 {
     //ゲーム開始からの経過時間
-    private float second = 0f;
+    private float second = 100f;
     //タイマーをオフにする
     private bool isGoal = false;
     //ベストタイム用の変数
@@ -25,11 +25,14 @@ public class GameDirector : MonoBehaviour
     private GameObject goal;
     //ゴールまでの距離を表示するテキスト
     private GameObject distanceText;
+    //スコアを表示するテキスト
+    private GameObject scoreText;
+    //スコアを入れる
+    private float nowScore;
     //ゴールまでの距離
     private float toGoal;
     //DistanceGageを入れる
     public Slider distanceGage;
-
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +48,8 @@ public class GameDirector : MonoBehaviour
         this.goalText = GameObject.Find("GoalText");
         //Timertextを取得
         this.timerText = GameObject.Find("TimerText");
+        //Scoretextを取得
+        this.scoreText = GameObject.Find("ScoreText");
         //RecordedTimeに保存された値を bestTimeTextに表示
         if (PlayerPrefs.HasKey("RecordedTime"))
         {
@@ -55,7 +60,6 @@ public class GameDirector : MonoBehaviour
                 bestTimeText.text = "Best:" + recordedTime.ToString("F2") + "sec";
             }
         }
-
     }
 
     // Update is called once per frame
@@ -93,9 +97,15 @@ public class GameDirector : MonoBehaviour
             return;
         }
         //ゲーム開始からの経過時間を計算
-        second += Time.deltaTime;
+        if (0 < second)
+        {
+            second -= Time.deltaTime;
+        }
         //経過時間を表示
         timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";
+        //スコアを表示
+        this.nowScore = player.GetComponent<sardineController>().score;
+        scoreText.GetComponent<Text>().text = "Score:" + nowScore.ToString() + "pt";
     }
 
     //プレーヤーがゴールしたことを判定する
