@@ -42,6 +42,12 @@ public class sardineController : MonoBehaviour
     private float invincibleRedShrimpScore;
     //コンボ
     public int combo = 0;
+    //コンボボーナスポイント
+    public int comboBonusPoint = 100;
+    //ボーナスポイントのテキスト
+    private GameObject comboBonusText;
+    //コンボの累積値
+    private int accumulateCombo = 0;
     //コリダーを入れる
     Collider m_collider = null;
 
@@ -58,6 +64,8 @@ public class sardineController : MonoBehaviour
         firstAnimator = this.myAnimator.speed;
         //コリダーコンポーネントを取得
         m_collider = GetComponent<Collider>();
+        //コンボボーナステキストを取得
+        this.comboBonusText = GameObject.Find("BonusPointText");
         //無敵状態の金のエビのスコア
         invincibleGoldShrimpScore = goldShrimpScore * 1.1f;
         //無敵状態の赤のエビのスコア
@@ -85,25 +93,34 @@ public class sardineController : MonoBehaviour
             this.velocityX *= coefficient;
             this.velocityZ *= coefficient;
             this.myAnimator.speed *= coefficient;
-        }   
+        }
         //無敵状態のときは速度を上昇
-        if(isInvincible)
+        if (isInvincible)
         {
             this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.invincibleVelocityZ);
         }
         else
         {
             //Sardineの速度を設定
-            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);           
+            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         //障害物以外に触れるとコンボ数を増加
-        if(other.gameObject.tag!= "ObstacleTag")
+        if (other.gameObject.tag != "ObstacleTag")
         {
             combo++;
+            accumulateCombo++;
+            //10コンボごとにボーナス
+            if(accumulateCombo==10)
+            {
+                score += comboBonusPoint;
+                accumulateCombo = 0;
+                comboBonusText.GetComponent<Text>().text = "Bonus +" + comboBonusPoint + "pt!!";
+                Invoke("ComboBonusTextEnable", 1f);
+            }
         }
         //非無敵状態での処理
         if (!isInvincible)
@@ -122,24 +139,26 @@ public class sardineController : MonoBehaviour
             if (other.gameObject.tag == "NormalItemTag")
             {
                 score += redShrimpScore;
-                if(velocityZ<maxSpeed)
+                if (velocityZ < maxSpeed)
                 {
                     this.myAnimator.speed += 0.3f;
-                    this.velocityZ += 10f;                  
+                    this.velocityZ += 10f;
                     Invoke("ResetSpeed", 0.8f);
-                }   
+                }
             }
             //障害物に触れたときの処理
             if (other.gameObject.tag == "ObstacleTag")
             {
                 //コンボ数をリセット
                 combo = 0;
+                //コンボの累積値リセット
+                accumulateCombo = 0;
                 //オブジェクトを点滅させる
                 this.myAnimator.Play("Invincible");
             }
         }
         //無敵時の処理
-       else if(isInvincible)
+        else if (isInvincible)
         {
             //獲得得点を上昇
             if (other.gameObject.tag == "InvincibleTag")
@@ -157,8 +176,8 @@ public class sardineController : MonoBehaviour
                 Destroy(other.gameObject);
             }
         }
-        
-      
+
+
         //ゴールに到着するとゲーム終了
         if (other.gameObject.tag == "GoalTag")
         {
@@ -178,5 +197,10 @@ public class sardineController : MonoBehaviour
     {
         this.myAnimator.speed = firstAnimator;
         this.velocityZ = firstVelocityZ;
+    }
+    //コンボボーナステキストを非表示に
+    private void ComboBonusTextEnable()
+    {
+        comboBonusText.GetComponent<Text>().text = "";
     }
 }
