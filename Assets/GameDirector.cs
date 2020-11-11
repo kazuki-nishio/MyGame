@@ -27,8 +27,8 @@ public class GameDirector : MonoBehaviour
     private GameObject distanceText;
     //スコアを表示するテキスト
     private GameObject scoreText;
-    //スコアを入れる
-    private float nowScore;
+    //コンボ数を表示するテキスト
+    private GameObject comboText;
     //ゴールまでの距離
     private float toGoal;
     //DistanceGageを入れる
@@ -50,6 +50,8 @@ public class GameDirector : MonoBehaviour
         this.timerText = GameObject.Find("TimerText");
         //Scoretextを取得
         this.scoreText = GameObject.Find("ScoreText");
+        //Combotextを取得
+        this.comboText = GameObject.Find("ComboText");
         //RecordedTimeに保存された値を bestTimeTextに表示
         if (PlayerPrefs.HasKey("RecordedTime"))
         {
@@ -104,8 +106,9 @@ public class GameDirector : MonoBehaviour
         //経過時間を表示
         timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";
         //スコアを表示
-        this.nowScore = player.GetComponent<sardineController>().score;
-        scoreText.GetComponent<Text>().text = "Score:" + nowScore.ToString() + "pt";
+        scoreText.GetComponent<Text>().text = "Score:" + player.GetComponent<sardineController>().score.ToString() + "pt";
+        //コンボ数を表示
+        comboText.GetComponent<Text>().text = player.GetComponent<sardineController>().combo.ToString() + "combo";
     }
 
     //プレーヤーがゴールしたことを判定する

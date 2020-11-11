@@ -40,6 +40,8 @@ public class sardineController : MonoBehaviour
     private float invincibleGoldShrimpScore;
     //無敵状態の赤のエビのスコア
     private float invincibleRedShrimpScore;
+    //コンボ
+    public int combo = 0;
     //コリダーを入れる
     Collider m_collider = null;
 
@@ -99,8 +101,23 @@ public class sardineController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        //障害物以外に触れるとコンボ数を増加
+        if(other.gameObject.tag!= "ObstacleTag")
+        {
+            combo++;
+        }
+        //障害物に触れたときの処理
+        if (other.gameObject.tag == "ObstacleTag")
+        {
+            //コリダーを無効化する
+            m_collider.enabled = false;
+            //オブジェクトを点滅させる
+            this.myAnimator.Play("Invincible");
+            //衝突から1秒後にコリダーを有効にする
+            Invoke("EnableCollider", 1f);
+        }
         //非無敵状態での処理
-        if(!isInvincible)
+        if (!isInvincible)
         {
             //金のエビに触れると無敵状態へ移行
             if (other.gameObject.tag == "InvincibleTag")
@@ -119,8 +136,7 @@ public class sardineController : MonoBehaviour
                 if(velocityZ<maxSpeed)
                 {
                     this.myAnimator.speed += 0.3f;
-                    this.velocityZ += 10f;
-                    Debug.Log(velocityZ);
+                    this.velocityZ += 10f;                  
                     Invoke("ResetSpeed", 0.8f);
                 }   
             }
@@ -145,16 +161,7 @@ public class sardineController : MonoBehaviour
             }
         }
         
-        //障害物に触れたときの処理
-        if (other.gameObject.tag == "ObstacleTag")
-        {        
-            //コリダーを無効化する
-            m_collider.enabled = false;
-            //オブジェクトを点滅させる
-            this.myAnimator.Play("Invincible");
-            //衝突から1秒後にコリダーを有効にする
-            Invoke("EnableCollider", 1f);
-        }
+      
         //ゴールに到着するとゲーム終了
         if (other.gameObject.tag == "GoalTag")
         {
