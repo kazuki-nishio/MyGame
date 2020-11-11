@@ -94,8 +94,7 @@ public class sardineController : MonoBehaviour
         else
         {
             //Sardineの速度を設定
-            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
-            
+            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);           
         }
     }
 
@@ -105,16 +104,6 @@ public class sardineController : MonoBehaviour
         if(other.gameObject.tag!= "ObstacleTag")
         {
             combo++;
-        }
-        //障害物に触れたときの処理
-        if (other.gameObject.tag == "ObstacleTag")
-        {
-            //コリダーを無効化する
-            m_collider.enabled = false;
-            //オブジェクトを点滅させる
-            this.myAnimator.Play("Invincible");
-            //衝突から1秒後にコリダーを有効にする
-            Invoke("EnableCollider", 1f);
         }
         //非無敵状態での処理
         if (!isInvincible)
@@ -140,6 +129,14 @@ public class sardineController : MonoBehaviour
                     Invoke("ResetSpeed", 0.8f);
                 }   
             }
+            //障害物に触れたときの処理
+            if (other.gameObject.tag == "ObstacleTag")
+            {
+                //コンボ数をリセット
+                combo = 0;
+                //オブジェクトを点滅させる
+                this.myAnimator.Play("Invincible");
+            }
         }
         //無敵時の処理
        else if(isInvincible)
@@ -155,7 +152,7 @@ public class sardineController : MonoBehaviour
                 score += invincibleRedShrimpScore;
             }
             //無敵状態で障害物に触れると障害物を破壊
-            if (other.gameObject.tag == "ObstacleTag" && isInvincible)
+            if (other.gameObject.tag == "ObstacleTag")
             {
                 Destroy(other.gameObject);
             }
@@ -169,11 +166,6 @@ public class sardineController : MonoBehaviour
             //isGoalをtrueにする
             GameObject.Find("GameDirector").GetComponent<GameDirector>().PlayerGoal();
         }
-    }
-    //コリダーを有効にする
-    private void EnableCollider()
-    {
-        m_collider.enabled = true;
     }
     //無敵状態を解除
     private void UnInvincible()
