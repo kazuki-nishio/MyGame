@@ -75,35 +75,46 @@ public class sardineController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //x軸方向の速度を初期化
-        float InputVelocityX = 0;
-        //左矢印が押されたら左方向の速度を代入
-        if (Input.GetKey(KeyCode.LeftArrow) && -this.moveX < this.transform.position.x)
+        //ゲームシーン読み込みから3秒までの処理
+        if(Time.timeSinceLevelLoad <= 3f)
         {
-            InputVelocityX = -this.moveX;
+            //プレイヤーの速度ベクトルを0に
+            this.myRigidBody.velocity = new Vector3(0, 0, 0);
         }
-        //右矢印が押されたら右方向の速度を代入
-        if (Input.GetKey(KeyCode.RightArrow) && this.transform.position.x < this.moveX)
-        {
-            InputVelocityX = this.moveX;
-        }
-        //クリア時に減速
-        if (this.isEnd)
-        {
-            this.velocityX *= coefficient;
-            this.velocityZ *= coefficient;
-            this.myAnimator.speed *= coefficient;
-        }
-        //無敵状態のときは速度を上昇
-        if (isInvincible)
-        {
-            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.invincibleVelocityZ);
-        }
+        //3秒以降の処理
         else
         {
-            //Sardineの速度を設定
-            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
+            //x軸方向の速度を初期化
+            float InputVelocityX = 0;
+            //左矢印が押されたら左方向の速度を代入
+            if (Input.GetKey(KeyCode.LeftArrow) && -this.moveX < this.transform.position.x)
+            {
+                InputVelocityX = -this.moveX;
+            }
+            //右矢印が押されたら右方向の速度を代入
+            if (Input.GetKey(KeyCode.RightArrow) && this.transform.position.x < this.moveX)
+            {
+                InputVelocityX = this.moveX;
+            }
+            //クリア時に減速
+            if (this.isEnd)
+            {
+                this.velocityX *= coefficient;
+                this.velocityZ *= coefficient;
+                this.myAnimator.speed *= coefficient;
+            }
+            //無敵状態のときは速度を上昇
+            if (isInvincible)
+            {
+                this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.invincibleVelocityZ);
+            }
+            else
+            {
+                //Sardineの速度を設定
+                this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
+            }
         }
+       
     }
 
     private void OnTriggerEnter(Collider other)
@@ -176,8 +187,6 @@ public class sardineController : MonoBehaviour
                 Destroy(other.gameObject);
             }
         }
-
-
         //ゴールに到着するとゲーム終了
         if (other.gameObject.tag == "GoalTag")
         {

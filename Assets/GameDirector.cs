@@ -11,6 +11,8 @@ public class GameDirector : MonoBehaviour
     private bool isGoal = false;
     //ベストタイム用の変数
     private float bestTime = 999f;
+    //ゲームスタート時のカウント
+    private int startCount = 3;
     //スコアの記録のON/OFF
     bool isScoreRecorded;
     //bestTimeTextを参照
@@ -29,6 +31,8 @@ public class GameDirector : MonoBehaviour
     private GameObject scoreText;
     //コンボ数を表示するテキスト
     private GameObject comboText;
+    //ゲームスタート時のカウントダウンを表示するテキスト
+    private GameObject countDownText;
     //ゴールまでの距離
     private float toGoal;
     //DistanceGageを入れる
@@ -37,29 +41,36 @@ public class GameDirector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        distanceGage.value = 0;
-        //プレイヤーオブジェクトを取得
-        this.player = GameObject.Find("Sardine");
-        //ゴールオブジェクトを取得
-        this.goal = GameObject.Find("Goal");
-        //DistanceTextを取得
-        this.distanceText = GameObject.Find("DistanceText");
-        //GoalTextを取得
-        this.goalText = GameObject.Find("GoalText");
-        //Timertextを取得
-        this.timerText = GameObject.Find("TimerText");
-        //Scoretextを取得
-        this.scoreText = GameObject.Find("ScoreText");
-        //Combotextを取得
-        this.comboText = GameObject.Find("ComboText");
-        //RecordedTimeに保存された値を bestTimeTextに表示
-        if (PlayerPrefs.HasKey("RecordedTime"))
+        //ゲームシーンでの処理
+        if (SceneManager.GetActiveScene().name == "SampleScene")
         {
-            float recordedTime = PlayerPrefs.GetFloat("RecordedTime");
-            bestTime = recordedTime;
-            if (recordedTime > 0)
+            //スタートと同時にカウントダウン
+            InvokeRepeating("CountDown", 0f, 1f);
+            //プレイヤーオブジェクトを取得
+            this.player = GameObject.Find("Sardine");
+            //ゴールオブジェクトを取得
+            this.goal = GameObject.Find("Goal");
+            //DistanceTextを取得
+            this.distanceText = GameObject.Find("DistanceText");
+            //GoalTextを取得
+            this.goalText = GameObject.Find("GoalText");
+            //Timertextを取得
+            this.timerText = GameObject.Find("TimerText");
+            //Scoretextを取得
+            this.scoreText = GameObject.Find("ScoreText");
+            //Combotextを取得
+            this.comboText = GameObject.Find("ComboText");
+            //CountDowntextを取得
+            this.countDownText = GameObject.Find("CountDownText");
+            //RecordedTimeに保存された値を bestTimeTextに表示
+            if (PlayerPrefs.HasKey("RecordedTime"))
             {
-                bestTimeText.text = "Best:" + recordedTime.ToString("F2") + "sec";
+                float recordedTime = PlayerPrefs.GetFloat("RecordedTime");
+                bestTime = recordedTime;
+                if (recordedTime > 0)
+                {
+                    bestTimeText.text = "Best:" + recordedTime.ToString("F2") + "sec";
+                }
             }
         }
     }
@@ -67,48 +78,56 @@ public class GameDirector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //プレーヤーとゴールまでの位置を計算
-        this.toGoal = goal.transform.position.z - player.transform.position.z;
-        //プレーヤーの進行度をゲージに表示
-        distanceGage.value = player.transform.position.z / goal.transform.position.z;
-        if (0 <= toGoal)
+        //ゲームシーンでの処理
+        if (SceneManager.GetActiveScene().name == "SampleScene")
         {
-            //ゴールまでの距離をDistanceTextに表示
-            distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
-        }
-        //ゴール後の処理
-        if (isGoal)
-        {
-            //RecordedTimeに経過時間を保存
-            if (!isScoreRecorded)
+            //ゲームシーン開始3秒以降の処理
+            if (3 < Time.timeSinceLevelLoad)
             {
-                //スコアがよければbestTimeを更新
-                if (second < bestTime)
+                //プレーヤーとゴールまでの位置を計算
+                this.toGoal = goal.transform.position.z - player.transform.position.z;
+                //プレーヤーの進行度をゲージに表示
+                distanceGage.value = player.transform.position.z / goal.transform.position.z;
+                if (0 <= toGoal)
                 {
-                    PlayerPrefs.SetFloat("RecordedTime", second);
+                    //ゴールまでの距離をDistanceTextに表示
+                    distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
                 }
-                //経過時間の計測をやめる
-                isScoreRecorded = true;
+                //ゴール後の処理
+                if (isGoal)
+                {
+                    //RecordedTimeに経過時間を保存
+                    if (!isScoreRecorded)
+                    {
+                        //スコアがよければbestTimeを更新
+                        if (second < bestTime)
+                        {
+                            PlayerPrefs.SetFloat("RecordedTime", second);
+                        }
+                        //経過時間の計測をやめる
+                        isScoreRecorded = true;
+                    }
+                    //マウスのボタンが押されたら最初のシーンに戻る
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //SampleSceneを読み込む
+                        SceneManager.LoadScene("SampleScene");
+                    }
+                    return;
+                }
+                //ゲーム開始からの経過時間を計算
+                if (0 < second)
+                {
+                    second -= Time.deltaTime;
+                }
+                //経過時間を表示
+                timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";
+                //スコアを表示
+                scoreText.GetComponent<Text>().text = "Score:" + player.GetComponent<sardineController>().score.ToString() + "pt";
+                //コンボ数を表示
+                comboText.GetComponent<Text>().text = player.GetComponent<sardineController>().combo.ToString() + "combo";
             }
-            //マウスのボタンが押されたら最初のシーンに戻る
-            if (Input.GetMouseButtonDown(0))
-            {
-                //SampleSceneを読み込む
-                SceneManager.LoadScene("SampleScene");
-            }
-            return;
         }
-        //ゲーム開始からの経過時間を計算
-        if (0 < second)
-        {
-            second -= Time.deltaTime;
-        }
-        //経過時間を表示
-        timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec";
-        //スコアを表示
-        scoreText.GetComponent<Text>().text = "Score:" + player.GetComponent<sardineController>().score.ToString() + "pt";
-        //コンボ数を表示
-        comboText.GetComponent<Text>().text = player.GetComponent<sardineController>().combo.ToString() + "combo";
     }
 
     //プレーヤーがゴールしたことを判定する
@@ -116,6 +135,31 @@ public class GameDirector : MonoBehaviour
     {
         isGoal = true;
         goalText.GetComponent<Text>().text = "GOAL!!";
+    }
+    //ゲーム開始と同時にカウントダウン
+    private void CountDown()
+    {
+        if (0 < startCount)
+        {
+            countDownText.GetComponent<Text>().text = startCount.ToString();
+            startCount--;
+        }
+        else if (startCount == 0)
+        {
+            countDownText.GetComponent<Text>().text = "Start!!";
+            Invoke("CountDownTextEnable", 1f);
+        }
+    }
+    //CountDownを無効化
+    private void CountDownTextEnable()
+    {
+        countDownText.SetActive(!countDownText.activeSelf);
+        CancelInvoke();
+    }
+    //ゲームスタートボタンを押すとゲームシーンを読みこむ
+    public void GameStartClick()
+    {
+        SceneManager.LoadScene("SampleScene");
     }
 }
 
