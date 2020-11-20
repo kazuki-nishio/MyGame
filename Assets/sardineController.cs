@@ -76,7 +76,7 @@ public class sardineController : MonoBehaviour
     void Update()
     {
         //ゲームシーン読み込みから3秒までの処理
-        if(Time.timeSinceLevelLoad <= 3f)
+        if (Time.timeSinceLevelLoad <= 3f)
         {
             //プレイヤーの速度ベクトルを0に
             this.myRigidBody.velocity = new Vector3(0, 0, 0);
@@ -101,6 +101,7 @@ public class sardineController : MonoBehaviour
             {
                 this.velocityX *= coefficient;
                 this.velocityZ *= coefficient;
+                this.invincibleVelocityZ *= coefficient;
                 this.myAnimator.speed *= coefficient;
             }
             //無敵状態のときは速度を上昇
@@ -114,7 +115,7 @@ public class sardineController : MonoBehaviour
                 this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
             }
         }
-       
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -125,7 +126,7 @@ public class sardineController : MonoBehaviour
             combo++;
             accumulateCombo++;
             //10コンボごとにボーナス
-            if(accumulateCombo==10)
+            if (accumulateCombo == 10)
             {
                 score += comboBonusPoint;
                 accumulateCombo = 0;
