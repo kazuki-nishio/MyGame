@@ -12,6 +12,8 @@ public class sardineController : MonoBehaviour
     private Animator myAnimator;
     //ゲーム開始時のアニメーションのスピード
     private float firstAnimator;
+    //加速中のアニメーションのスピード
+    private float accelAnimatorSpeed;
     //通常時の前方向の速度
     public float velocityZ = 15f;
     //無敵状態の時の前方向の速度
@@ -22,10 +24,12 @@ public class sardineController : MonoBehaviour
     private float velocityX = 10f;
     //横方向の移動範囲
     private float moveX = 3f;
+    //加速させる係数
+    public float accel = 1.1f;
     //減速させる係数
-    private float coefficient = 0.99f;
+    public float decel = 0.99f;
     //前方向の速度の上昇限界値
-    float maxSpeed = 50f;
+    public float maxSpeed = 50f;
     //ゲームオーバーの判定
     private bool isEnd = false;
     //無敵状態の判定
@@ -70,6 +74,8 @@ public class sardineController : MonoBehaviour
         invincibleGoldShrimpScore = goldShrimpScore * 1.1f;
         //無敵状態の赤のエビのスコア
         invincibleRedShrimpScore = redShrimpScore * 1.1f;
+        //加速中のアニメーションのスピード
+        this.accelAnimatorSpeed = firstAnimator + 0.6f;
     }
 
     // Update is called once per frame
@@ -99,10 +105,10 @@ public class sardineController : MonoBehaviour
             //クリア時に減速
             if (this.isEnd)
             {
-                this.velocityX *= coefficient;
-                this.velocityZ *= coefficient;
-                this.invincibleVelocityZ *= coefficient;
-                this.myAnimator.speed *= coefficient;
+                this.velocityX *= decel;
+                this.velocityZ *= decel;
+                this.invincibleVelocityZ *= decel;
+                this.myAnimator.speed *= decel;
             }
             //無敵状態のときは速度を上昇
             if (isInvincible)
@@ -111,6 +117,18 @@ public class sardineController : MonoBehaviour
             }
             else
             {
+                //スペースキーが押されるとmaxSpeedまで加速
+                if(Input.GetButton("Jump") && velocityZ < maxSpeed && !isEnd )
+                {
+                    this.velocityZ *= accel;
+                    this.myAnimator.speed = accelAnimatorSpeed;
+                }
+                //離すとminSpeedまで減速
+                if(Input.GetButtonUp("Jump") && !isEnd)
+                {
+                    this.velocityZ =firstVelocityZ;
+                    this.myAnimator.speed = firstAnimator;
+                }
                 //Sardineの速度を設定
                 this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
             }
@@ -151,12 +169,6 @@ public class sardineController : MonoBehaviour
             if (other.gameObject.tag == "NormalItemTag")
             {
                 score += redShrimpScore;
-                if (velocityZ < maxSpeed)
-                {
-                    this.myAnimator.speed += 0.3f;
-                    this.velocityZ += 10f;
-                    Invoke("ResetSpeed", 0.8f);
-                }
             }
             //障害物に触れたときの処理
             if (other.gameObject.tag == "ObstacleTag")
@@ -201,12 +213,6 @@ public class sardineController : MonoBehaviour
     {
         isInvincible = false;
         this.myAnimator.speed = firstAnimator;
-    }
-    //赤いエビによって上昇した速度をリセット
-    private void ResetSpeed()
-    {
-        this.myAnimator.speed = firstAnimator;
-        this.velocityZ = firstVelocityZ;
     }
     //コンボボーナステキストを非表示に
     private void ComboBonusTextEnable()

@@ -780,6 +780,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocityZ: 15
   invincibleVelocityZ: 50
+  accel: 1.1
+  decel: 0.99
+  maxSpeed: 50
+  minSpeed: 15
   score: 0
   goldShrimpScore: 50
   redShrimpScore: 10
@@ -2699,7 +2703,7 @@ MonoBehaviour:
     type: 3}
   redShrimpPrefab: {fileID: 1259257797998071600, guid: b71f60a1622e32d419991dd592705ac3,
     type: 3}
-  goldShrimpPrefab: {fileID: 7423215369029347030, guid: 946b043e0c7c0db418010a32b4b7868c,
+  goldShrimpPrefab: {fileID: 1259257797998071600, guid: b71f60a1622e32d419991dd592705ac3,
     type: 3}
   goal: {fileID: 301467962}
   fishinBoatPrefab: {fileID: 225340883012276027, guid: 54bdef47c274d46449191d2326638458,
