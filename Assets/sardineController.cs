@@ -138,11 +138,14 @@ public class sardineController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //障害物以外に触れるとコンボ数を増加
+        //障害物以外に触れたときの処理
         if (other.gameObject.tag != "ObstacleTag")
         {
+            //コンボ数を増加
             combo++;
             accumulateCombo++;
+            //アイテムを削除
+            Destroy(other.gameObject);
             //10コンボごとにボーナス
             if (accumulateCombo == 10)
             {
