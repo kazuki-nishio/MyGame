@@ -84,7 +84,6 @@ public class ObjectController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(isBoat);
         // プレイヤーが背景の奥行の分だけ前進したら、一番後ろの背景を最も前方に移動させる
         if (m_lastTimeMovedBackgroundPositionZ + m_depth < m_player.transform.position.z)
         {
@@ -109,7 +108,7 @@ public class ObjectController : MonoBehaviour
             if (goal.transform.position.z * 0.39f <= m_player.transform.position.z + itemGenerateRange &&  m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.41f && !isBoat)
             {
                 GameObject boat = Instantiate(fishinBoatPrefab);
-                boat.transform.position = new Vector3(-6f, 0, m_player.transform.position.z + 150f);
+                boat.transform.position = new Vector3(-6f, 0, m_player.transform.position.z + 100f);
                 isBoat = true;
             }
             //コースの80%までのアイテム生成

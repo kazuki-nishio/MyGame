@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1989074404020821385}
   - component: {fileID: 1989074404019764421}
   - component: {fileID: 1989074403093487737}
+  - component: {fileID: 3784481296685549047}
   m_Layer: 0
   m_Name: TrashBagPrefab
   m_TagString: ObstacleTag
@@ -93,3 +94,15 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 3.1412373
   m_Center: {x: 0.41264272, y: 2.9196692, z: 0.1764301}
+--- !u!114 &3784481296685549047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1989074404017631297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 731a8aeea2e2545489f9c3ac89a84e65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
