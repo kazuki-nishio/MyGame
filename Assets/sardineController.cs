@@ -54,6 +54,8 @@ public class sardineController : MonoBehaviour
     private int accumulateCombo = 0;
     //コリダーを入れる
     Collider m_collider = null;
+    //スペースキー入力の有効・無効を判定するための変数
+    private bool spaceSwitch = true;
 
     // Start is called before the first frame update
     void Start()
@@ -118,12 +120,12 @@ public class sardineController : MonoBehaviour
             else
             {
                 //スペースキーが押されるとmaxSpeedまで加速
-                if(Input.GetButton("Jump") && velocityZ < maxSpeed && !isEnd )
+                if(Input.GetButton("Jump") && velocityZ < maxSpeed && !isEnd && spaceSwitch)
                 {
                     this.velocityZ *= accel;
                     this.myAnimator.speed = accelAnimatorSpeed;
                 }
-                //離すとminSpeedまで減速
+                //離すと速度を初期状態に戻す
                 if(Input.GetButtonUp("Jump") && !isEnd)
                 {
                     this.velocityZ =firstVelocityZ;
@@ -139,7 +141,7 @@ public class sardineController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //障害物以外に触れたときの処理
-        if (other.gameObject.tag != "ObstacleTag")
+        if (other.gameObject.tag != "ObstacleTag" && other.gameObject.tag!="GoalTag")
         {
             //コンボ数を増加
             combo++;
@@ -180,6 +182,12 @@ public class sardineController : MonoBehaviour
                 combo = 0;
                 //コンボの累積値リセット
                 accumulateCombo = 0;
+                //プレーヤーの速度を初期速度へ
+                this.velocityZ = firstVelocityZ;
+                this.myAnimator.speed = firstAnimator;
+                //スペースキーの入力を1秒間無効化
+                spaceSwitch = false;
+                Invoke("SpaceActive", 1f);
                 //オブジェクトを点滅させる
                 this.myAnimator.Play("Invincible");
             }
@@ -221,5 +229,10 @@ public class sardineController : MonoBehaviour
     private void ComboBonusTextEnable()
     {
         comboBonusText.GetComponent<Text>().text = "";
+    }
+    //スペースキーの入力を有効化
+    private void SpaceActive()
+    {
+        spaceSwitch = true;
     }
 }
