@@ -23,44 +23,54 @@ public class BoatController : MonoBehaviour
     // Start is called before the first fraboatGeneratingPointme update
     void Start()
     {
-        //InstantiateObstacleを1秒ごとに呼び出す
-        InvokeRepeating("InstantiateObstacle", 0f, 1f);
-        //fishingBoatのRigidBodyを取得
-        this.boatRigid = GetComponent<Rigidbody>();
         //プレーヤのオブジェクトを取得
         this.sardine = GameObject.Find("Sardine");
         //プレーヤーのRigidBodyを取得
         sardineRigid = sardine.GetComponent<Rigidbody>();
-        //ボート生成時の座標をboatGeneratingPointへ設定
-        boatGeneratingPoint = this.transform.position.z;
+        if (gameObject.tag!="GoalBoatTag")
+        {
+            //InstantiateObstacleを1秒ごとに呼び出す
+            InvokeRepeating("InstantiateObstacle", 0f, 1f);
+            //fishingBoatのRigidBodyを取得
+            this.boatRigid = GetComponent<Rigidbody>();          
+            //ボート生成時の座標をboatGeneratingPointへ設定
+            boatGeneratingPoint = this.transform.position.z;
+        }    
     }
 
     // Update is called once per frame
     void Update()
     {
-        //前方向の速度を設定
-        if (70f < this.transform.position.z - sardine.transform.position.z)
+        if(gameObject.tag=="GoalBoatTag")
         {
-            this.fishingBoatVelocityZ = sardineRigid.velocity.z * 0.6f;
+            this.transform.position = new Vector3(sardine.transform.position.x, this.transform.position.y, this.transform.position.z);
         }
-        else if (this.transform.position.z - sardine.transform.position.z <= 70f)
+        else
         {
-            this.fishingBoatVelocityZ = sardineRigid.velocity.z;
-        }
-        //Sin関数の角度を増加
-        this.radian += 1.2d;
-        //横方向の移動速度を設定
-        this.fishingBoatVelocityX = (float)System.Math.Sin(radian * (System.Math.PI / 180)) * 15f;
-        //一定距離を進んだら加速してオブジェクトを消去
-        if (boatGeneratingPoint + 500f < this.transform.position.z)
-        {
-            CancelInvoke("InstantiateObstacle");
-            fishingBoatVelocityX = 0;
-            this.fishingBoatVelocityZ = sardineRigid.velocity.z * 2.5f;
-            Invoke("boatDelete",1.5f);
-        }
-        //fishingBoatの速度を設定
-        this.boatRigid.velocity = new Vector3(fishingBoatVelocityX, 0, fishingBoatVelocityZ);
+            //前方向の速度を設定
+            if (70f < this.transform.position.z - sardine.transform.position.z)
+            {
+                this.fishingBoatVelocityZ = sardineRigid.velocity.z * 0.6f;
+            }
+            else if (this.transform.position.z - sardine.transform.position.z <= 70f)
+            {
+                this.fishingBoatVelocityZ = sardineRigid.velocity.z;
+            }
+            //Sin関数の角度を増加
+            this.radian += 1.2d;
+            //横方向の移動速度を設定
+            this.fishingBoatVelocityX = (float)System.Math.Sin(radian * (System.Math.PI / 180)) * 15f;
+            //一定距離を進んだら加速してオブジェクトを消去
+            if (boatGeneratingPoint + 500f < this.transform.position.z)
+            {
+                CancelInvoke("InstantiateObstacle");
+                fishingBoatVelocityX = 0;
+                this.fishingBoatVelocityZ = sardineRigid.velocity.z * 2.5f;
+                Invoke("boatDelete", 1.5f);
+            }
+            //fishingBoatの速度を設定
+            this.boatRigid.velocity = new Vector3(fishingBoatVelocityX, 0, fishingBoatVelocityZ);
+        }     
     }
 
     //障害物を生成する
