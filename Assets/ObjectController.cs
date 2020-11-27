@@ -35,6 +35,8 @@ public class ObjectController : MonoBehaviour
     float lastTimeGenerateItemPositionZ;
     //FishinBoatPrefab
     public GameObject fishinBoatPrefab;
+    //GoalBoatPrefab
+    public GameObject GoalBoatPrefab;
     //FishinBoatを1つだけ生成するための変数
     private bool isBoat = false;
     // Start is called before the first frame update
@@ -110,6 +112,12 @@ public class ObjectController : MonoBehaviour
                 GameObject boat = Instantiate(fishinBoatPrefab);
                 boat.transform.position = new Vector3(-6f, 0, m_player.transform.position.z + 100f);
                 isBoat = true;
+            }
+            if (goal.transform.position.z * 0.79f <= m_player.transform.position.z + itemGenerateRange && m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.81f && isBoat)
+            {
+                GameObject boat = Instantiate(GoalBoatPrefab);
+                boat.transform.position = new Vector3(boat.transform.position.x, boat.transform.position.y, goal.transform.position.z);
+                isBoat = false;
             }
             //コースの80%までのアイテム生成
             if (m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.8)
