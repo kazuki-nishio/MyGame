@@ -17,25 +17,25 @@ public class sardineController : MonoBehaviour
     //通常時の前方向の速度
     public float velocityZ = 15f;
     //無敵状態の時の前方向の速度
-    public float invincibleVelocityZ = 50f;
+    public float invincibleVelocityZ = 60f;
     //ゲーム開始時の前方向の速度
     private float firstVelocityZ;
     //横方向の速度
     private float velocityX = 10f;
     //横方向の移動範囲
     private float moveX = 3f;
-    //加速させる係数
-    public float accel = 1.1f;
+    //加速した時の速度
+    private float accelVelocityZ = 50f;
     //減速させる係数
     public float decel = 0.99f;
-    //前方向の速度の上昇限界値
-    public float maxSpeed = 50f;
     //ゲームオーバーの判定
     private bool isEnd = false;
     //無敵状態の判定
-    private bool isInvincible = false;
+   [System.NonSerialized] public bool isInvincible = false;
+    //無敵状態へ移行するためのポイント
+    [System.NonSerialized] public float invinciblePoint;
     //スコアを入れる
-    public float score = 0;
+   [System.NonSerialized] public float score = 0;
     //通常時の金のエビのスコア
     public float goldShrimpScore = 50f;
     //通常時の赤いエビのスコア
@@ -45,7 +45,7 @@ public class sardineController : MonoBehaviour
     //無敵状態の赤のエビのスコア
     private float invincibleRedShrimpScore;
     //コンボ
-    public int combo = 0;
+    [System.NonSerialized] public int combo = 0;
     //コンボボーナスポイント
     public int comboBonusPoint = 100;
     //ボーナスポイントのテキスト
@@ -112,37 +112,47 @@ public class sardineController : MonoBehaviour
                 this.invincibleVelocityZ *= decel;
                 this.myAnimator.speed *= decel;
             }
-            //無敵状態のときは速度を上昇
+            //無敵状態のとき速度
             if (isInvincible)
             {
-                this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.invincibleVelocityZ);
+                this.velocityZ = invincibleVelocityZ;
+                //無敵時に巨大化
+                this.transform.localScale = new Vector3(20, 20, 20);
             }
-            else
+            //非無敵状態のときの速度
+            else if(!isInvincible)
             {
+                this.transform.localScale = new Vector3(10, 10, 10);
                 //スペースキーが押されるとmaxSpeedまで加速
-                if(Input.GetButton("Jump") && velocityZ < maxSpeed && !isEnd && spaceSwitch)
+                if (Input.GetButton("Jump") && !isEnd && spaceSwitch)
                 {
-                    this.velocityZ *= accel;
+                    this.velocityZ = accelVelocityZ;
                     this.myAnimator.speed = accelAnimatorSpeed;
                 }
                 //離すと速度を初期状態に戻す
-                if(Input.GetButtonUp("Jump") && !isEnd)
+                else if (Input.GetButtonUp("Jump") && !isEnd)
                 {
-                    this.velocityZ =firstVelocityZ;
+                    this.velocityZ = firstVelocityZ;
                     this.myAnimator.speed = firstAnimator;
                 }
-                //Sardineの速度を設定
-                this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
+                else
+                {
+                    this.velocityZ = firstVelocityZ;
+                    this.myAnimator.speed = firstAnimator;
+                }
             }
+            //Sardineの速度を設定
+            this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
         }
-
     }
 
     private void OnTriggerEnter(Collider other)
     {
         //障害物以外に触れたときの処理
-        if (other.gameObject.tag != "ObstacleTag" && other.gameObject.tag!="GoalTag")
+        if (other.gameObject.tag != "ObstacleTag" && other.gameObject.tag != "GoalTag")
         {
+            //パーティクルを再生
+            GetComponent<ParticleSystem>().Play();
             //コンボ数を増加
             combo++;
             accumulateCombo++;
@@ -162,18 +172,17 @@ public class sardineController : MonoBehaviour
         {
             //金のエビに触れると無敵状態へ移行
             if (other.gameObject.tag == "InvincibleTag")
-            {
-                isInvincible = true;
-                this.myAnimator.speed += 0.6f;
+            {              
                 //得点を取得
                 score += goldShrimpScore;
-                //5秒後に解除
-                Invoke("UnInvincible", 5f);
+                //無敵ポイントを取得
+                invinciblePoint += 30f;               
             }
             //赤いエビに触れると得点を獲得し一定時間速度を上昇させる
             if (other.gameObject.tag == "NormalItemTag")
             {
                 score += redShrimpScore;
+                invinciblePoint += 10f;
             }
             //障害物に触れたときの処理
             if (other.gameObject.tag == "ObstacleTag")
@@ -191,10 +200,19 @@ public class sardineController : MonoBehaviour
                 //オブジェクトを点滅させる
                 this.myAnimator.Play("Invincible");
             }
+            //一定以上の無敵ポイントを取得で無敵状態へ移行
+            if(100f <= invinciblePoint)
+            {
+                isInvincible = true;
+                this.myAnimator.speed += 0.6f;
+                invinciblePoint = 0f;
+                //5秒後に解除
+                Invoke("UnInvincible", 5f);
+            }
         }
         //無敵時の処理
         else if (isInvincible)
-        {
+        {    
             //獲得得点を上昇
             if (other.gameObject.tag == "InvincibleTag")
             {
