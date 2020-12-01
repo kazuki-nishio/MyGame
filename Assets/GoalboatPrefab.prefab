@@ -91,8 +91,8 @@ GameObject:
   - component: {fileID: 7506321488823340631}
   - component: {fileID: 7506321488823340630}
   m_Layer: 0
-  m_Name: fishing_boat
-  m_TagString: GoalBoatTag
+  m_Name: GoalboatPrefab
+  m_TagString: GoalTag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -139,7 +139,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 902b68579873d78408bc770a5d0ef42b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obstaclePrefab: {fileID: 0}
+  obstaclePrefab: {fileID: 1989074404017631297, guid: 858f978d02e412c49809baedc6a9e45d,
+    type: 3}
 --- !u!1 &7506321487979994308
 GameObject:
   m_ObjectHideFlags: 0

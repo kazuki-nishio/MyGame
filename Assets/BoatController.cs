@@ -13,6 +13,8 @@ public class BoatController : MonoBehaviour
     private float fishingBoatVelocityX;
     //fishingBoat生成時のボートの座標
     private float boatGeneratingPoint;
+    //FishingBoatの回転角
+    private float rotRad = 0f;
     //Sin関数へ入れる角度
     private double radian = 0d;
     //プレーヤーオブジェクト
@@ -27,7 +29,7 @@ public class BoatController : MonoBehaviour
         this.sardine = GameObject.Find("Sardine");
         //プレーヤーのRigidBodyを取得
         sardineRigid = sardine.GetComponent<Rigidbody>();
-        if (gameObject.tag!="GoalBoatTag")
+        if (gameObject.tag!="GoalTag")
         {
             //InstantiateObstacleを1秒ごとに呼び出す
             InvokeRepeating("InstantiateObstacle", 0f, 1f);
@@ -41,9 +43,14 @@ public class BoatController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(gameObject.tag=="GoalBoatTag")
+        if(gameObject.tag == "GoalTag")
         {
             this.transform.position = new Vector3(sardine.transform.position.x, this.transform.position.y, this.transform.position.z);
+            if(this.transform.position.z < sardine.transform.position.z && rotRad < 3f)
+            {
+                rotRad += 0.1f;
+                this.transform.Rotate(0, 0, rotRad,Space.World);
+            }
         }
         else
         {
