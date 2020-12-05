@@ -17,7 +17,7 @@ public class sardineController : MonoBehaviour
     //通常時の前方向の速度
     public float velocityZ = 15f;
     //無敵状態の時の前方向の速度
-    public float invincibleVelocityZ = 60f;
+    public float invincibleVelocityZ = 90f;
     //ゲーム開始時の前方向の速度
     private float firstVelocityZ;
     //横方向の速度
@@ -56,10 +56,14 @@ public class sardineController : MonoBehaviour
     Collider m_collider = null;
     //スペースキー入力の有効・無効を判定するための変数
     private bool spaceSwitch = true;
+    //BigExplosionオブジェクトを入れる
+    private GameObject bigExplosion;
 
     // Start is called before the first frame update
     void Start()
     {
+        //BigExplosionオブジェクトを取得
+        this.bigExplosion = GameObject.Find("BigExplosion");
         //sardineのrigidbodyコンポーネントを取得
         this.myRigidBody = GetComponent<Rigidbody>();
         //sardineのAnimationコンポーネントを取得
@@ -105,42 +109,45 @@ public class sardineController : MonoBehaviour
                 InputVelocityX = this.moveX;
             }
             //クリア時に減速
-            if (this.isEnd)
-            {
+            if (isEnd)
+            {              
                 this.velocityX *= decel;
                 this.velocityZ *= decel;
                 this.invincibleVelocityZ *= decel;
                 this.myAnimator.speed *= decel;
             }
-            //無敵状態のとき速度
-            if (isInvincible)
+            else if(!isEnd)
             {
-                this.velocityZ = invincibleVelocityZ;
-                //無敵時に巨大化
-                this.transform.localScale = new Vector3(20, 20, 20);
-            }
-            //非無敵状態のときの速度
-            else if(!isInvincible)
-            {
-                this.transform.localScale = new Vector3(10, 10, 10);
-                //スペースキーが押されるとmaxSpeedまで加速
-                if (Input.GetButton("Jump") && !isEnd && spaceSwitch)
+                //無敵状態のとき速度
+                if (isInvincible)
                 {
-                    this.velocityZ = accelVelocityZ;
-                    this.myAnimator.speed = accelAnimatorSpeed;
+                    this.velocityZ = invincibleVelocityZ;
+                    //無敵時に巨大化
+                    this.transform.localScale = new Vector3(20, 20, 20);
                 }
-                //離すと速度を初期状態に戻す
-                else if (Input.GetButtonUp("Jump") && !isEnd)
+                //非無敵状態のときの速度
+                else if (!isInvincible)
                 {
-                    this.velocityZ = firstVelocityZ;
-                    this.myAnimator.speed = firstAnimator;
+                    this.transform.localScale = new Vector3(10, 10, 10);
+                    //スペースキーが押されるとmaxSpeedまで加速
+                    if (Input.GetButton("Jump") && !isEnd && spaceSwitch)
+                    {
+                        this.velocityZ = accelVelocityZ;
+                        this.myAnimator.speed = accelAnimatorSpeed;
+                    }
+                    //離すと速度を初期状態に戻す
+                    else if (Input.GetButtonUp("Jump") && !isEnd)
+                    {
+                        this.velocityZ = firstVelocityZ;
+                        this.myAnimator.speed = firstAnimator;
+                    }
+                    else
+                    {
+                        this.velocityZ = firstVelocityZ;
+                        this.myAnimator.speed = firstAnimator;
+                    }
                 }
-                else
-                {
-                    this.velocityZ = firstVelocityZ;
-                    this.myAnimator.speed = firstAnimator;
-                }
-            }
+            }            
             //Sardineの速度を設定
             this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
         }
@@ -207,7 +214,7 @@ public class sardineController : MonoBehaviour
                 this.myAnimator.speed += 0.6f;
                 invinciblePoint = 0f;
                 //5秒後に解除
-                Invoke("UnInvincible", 5f);
+                Invoke("UnInvincible", 8f);
             }
         }
         //無敵時の処理
@@ -235,6 +242,9 @@ public class sardineController : MonoBehaviour
             isEnd = true;
             //isGoalをtrueにする
             GameObject.Find("GameDirector").GetComponent<GameDirector>().PlayerGoal();
+            //BigExplosionを再生
+            bigExplosion.transform.position = this.transform.position;
+            bigExplosion.GetComponent<ParticleSystem>().Play();
         }
     }
     //無敵状態を解除
