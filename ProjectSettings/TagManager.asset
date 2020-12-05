@@ -9,6 +9,7 @@ TagManager:
   - GoalTag
   - InvincibleTag
   - NormalItemTag
+  - GoalBoatTag
   layers:
   - Default
   - TransparentFX
