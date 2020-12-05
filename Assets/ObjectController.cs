@@ -156,29 +156,12 @@ public class ObjectController : MonoBehaviour
             //コースの80%～ゴールまでのアイテム生成
             else if (goal.transform.position.z * 0.8 < m_player.transform.position.z + itemGenerateRange)
             {
-                //アイテムを生成
-                for (int j = -1; j <= 1; j++)
+                for(int i = 0;i < 5;i++)
                 {
-                    shrimpGenerationRate = Random.Range(1, 5);
-                    srimpOffSetZ = Random.Range(-5, 6);
-                    //確立で各レーンのアイテムを生成
-                    if (shrimpGenerationRate <= 3)
-                    {
-                        //金のエビの生成
-                        goldShrimpGenerationRate = Random.Range(1, 6);
-                        if (goldShrimpGenerationRate <= 2)
-                        {
-                            GameObject goldSrimp = Instantiate(goldShrimpPrefab);
-                            goldSrimp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + srimpOffSetZ);
-                        }
-                        //赤いエビ生成
-                        else if (2 < goldShrimpGenerationRate)
-                        {
-                            GameObject redShrimp = Instantiate(redShrimpPrefab);
-                            redShrimp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + srimpOffSetZ);
-                        }
-                    }
-                }
+                    GameObject finalShrimp = Instantiate(goldShrimpPrefab);
+                    finalShrimp.transform.localScale = new Vector3(3, 3, 3);
+                    finalShrimp.transform.position = new Vector3(0, 3f, goal.transform.position.z * 0.9f);
+                }                
             }
             lastTimeGenerateItemPositionZ = m_player.transform.position.z;
         }
