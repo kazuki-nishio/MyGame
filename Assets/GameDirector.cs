@@ -13,8 +13,6 @@ public class GameDirector : MonoBehaviour
     private float second = 100f;
     //タイマーをオフにする
     private bool isGoal = false;
-    //ベストタイム用の変数
-    private float bestTime = 999f;
     //ゲームスタート時のカウント
     private int startCount = 3;
     //スコアの記録のON/OFF
@@ -22,7 +20,7 @@ public class GameDirector : MonoBehaviour
     //スコアを入れる
     private float score;
     //bestTimeTextを参照
-    public UnityEngine.UI.Text bestTimeText=null;
+    public UnityEngine.UI.Text bestTimeText = null;
     //ゴールした際に表示するテキスト
     private GameObject goalText;
     //タイマーテキスト
@@ -42,7 +40,7 @@ public class GameDirector : MonoBehaviour
     //ゴールまでの距離
     private float toGoal;
     //DistanceGageを入れる
-    public Slider distanceGage=null;
+    public Slider distanceGage = null;
     //パネルUIを入れる
     private GameObject panel;
     private float red;
@@ -55,17 +53,25 @@ public class GameDirector : MonoBehaviour
 
     /// リザルトシーンで使用する変数
     //スコアテキストを入れる
-    [SerializeField] private GameObject resultScoreText=null;
+    [SerializeField] private GameObject resultScoreText = null;
     //タイムスコアテキストを入れる
-    [SerializeField] private GameObject timeScoreText=null;
+    [SerializeField] private GameObject timeScoreText = null;
     //トータルスコアテキストを入れる
-    [SerializeField] private GameObject totalScoreText=null;
+    [SerializeField] private GameObject totalScoreText = null;
+    //ニューレコードテキストを入れる
+    [SerializeField] private GameObject newRecordText = null;
+    //ベストスコアを表示するテキストを入れる
+    [SerializeField] private GameObject BestScoreText = null;
     //ゴール時の時間を入れる
     private float finishTime;
     //ゴール時のスコアを入れる
     private float finalScore;
     //トータルスコアを入れる
     private float totalScore;
+    //パーティクルシステムを入れる
+    private GameObject[] particleObject;
+    //ベストスコアを入れる
+    private float bestScore = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -98,32 +104,28 @@ public class GameDirector : MonoBehaviour
             this.red = panel.GetComponent<Image>().color.r;
             this.green = panel.GetComponent<Image>().color.g;
             this.blue = panel.GetComponent<Image>().color.b;
-            //RecordedTimeに保存された値を bestTimeTextに表示
-            if (PlayerPrefs.HasKey("RecordedTime"))
-            {
-                float recordedTime = PlayerPrefs.GetFloat("RecordedTime");
-                bestTime = recordedTime;
-                if (recordedTime > 0)
-                {
-                    bestTimeText.text = "Best:" + recordedTime.ToString("F2") + "sec";
-                }
-            }
         }
         if (SceneManager.GetActiveScene().name == "ResultScene")
         {
             this.totalScore = this.finalScore + (this.finishTime * 10f);
- 
+            bestScore = PlayerPrefs.GetFloat("RecordedScore");
+            BestScoreText.GetComponent<Text>().text = "Best：" + bestScore.ToString("F0") + "pt";
+            if (bestScore < totalScore)
+            {
+                PlayerPrefs.SetFloat("RecordedScore", totalScore);
+                this.particleObject = GameObject.FindGameObjectsWithTag("ParticleTag");
+            }
         }
     }
     //ゴール時の得点とタイムをリザルトシーンへ受け渡す
-    private void ResultGameSceneLoded(Scene scene,LoadSceneMode mode)
+    private void ResultGameSceneLoded(Scene scene, LoadSceneMode mode)
     {
-        if(SceneManager.GetActiveScene().name=="ResultScene")
+        if (SceneManager.GetActiveScene().name == "ResultScene")
         {
             var gameDirector = GameObject.Find("GameDirector").GetComponent<GameDirector>();
-            gameDirector.finishTime  = this.second;
+            gameDirector.finishTime = this.second;
             gameDirector.finalScore = this.score;
-        }      
+        }
     }
 
     // Update is called once per frame
@@ -148,7 +150,7 @@ public class GameDirector : MonoBehaviour
                 }
                 //ゴール後の処理
                 if (isGoal)
-                {                   
+                {
                     //ゴール後に画面をフェード
                     StartCoroutine(DelayMethod(4f, () =>
                     {
@@ -159,18 +161,6 @@ public class GameDirector : MonoBehaviour
                             SceneManager.LoadScene("ResultScene");
                         }
                     }));
-                    //RecordedTimeに経過時間を保存
-                    if (!isScoreRecorded)
-                    {
-                        //スコアがよければbestTimeを更新
-                        if (second < bestTime)
-                        {
-                            PlayerPrefs.SetFloat("RecordedTime", second);
-                        }
-                        //経過時間の計測をやめる
-                        isScoreRecorded = true;
-                    }
-                    return;
                 }
                 //ゲーム開始からの経過時間を計算
                 if (0 < second)
@@ -190,12 +180,11 @@ public class GameDirector : MonoBehaviour
         {
             StartCoroutine(DelayMethod(1f, () =>
             {
-                resultScoreText.SetActive(true);
                 resultScoreText.GetComponent<Text>().text = "Score：" + this.finalScore.ToString() + " pt";
                 StartCoroutine(DelayMethod(1f, () =>
                  {
                      StartCoroutine("IndicateScore");
-                 }));               
+                 }));
             }));
         }
     }
@@ -249,11 +238,25 @@ public class GameDirector : MonoBehaviour
     //各種得点を表示するコルーチン
     IEnumerator IndicateScore()
     {
-        timeScoreText.SetActive(true);
-        timeScoreText.GetComponent<Text>().text= "Time：" + finishTime.ToString("F1") + "×10 = " + (this.finishTime * 10f).ToString("F0") + " pt";
+        timeScoreText.GetComponent<Text>().text = "Time：" + finishTime.ToString("F1") + "×10 = " + (this.finishTime * 10f).ToString("F0") + " pt";
         yield return new WaitForSeconds(1f);
-        totalScoreText.SetActive(true);
-        totalScoreText.GetComponent<Text>().text= "Total：" + totalScore.ToString("F0") + " pt";
+        totalScoreText.GetComponent<Text>().text = "Total：" + totalScore.ToString("F0") + " pt";
+        //ハイスコアならニューレコードテキストを表示し、パーティクルを再生
+        if (bestScore < totalScore)
+        {
+            StartCoroutine(DelayMethod(1.5f, () =>
+            {
+                resultScoreText.SetActive(false);
+                timeScoreText.SetActive(false);
+                newRecordText.SetActive(true);
+                newRecordText.GetComponent<Text>().text = "New Record!!";
+                for (int i = 0; i < particleObject.Length; i++)
+                {
+                    GameObject particle = particleObject[i];
+                    particle.GetComponent<ParticleSystem>().Play();
+                }
+            }));
+        }
     }
 }
 

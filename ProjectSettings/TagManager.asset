@@ -10,6 +10,7 @@ TagManager:
   - InvincibleTag
   - NormalItemTag
   - GoalBoatTag
+  - ParticleTag
   layers:
   - Default
   - TransparentFX
