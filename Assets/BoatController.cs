@@ -66,7 +66,7 @@ public class BoatController : MonoBehaviour
             //Sin関数の角度を増加
             this.radian += 1.2d;
             //横方向の移動速度を設定
-            this.fishingBoatVelocityX = (float)System.Math.Sin(radian * (System.Math.PI / 180)) * 15f;
+            this.fishingBoatVelocityX = (float)System.Math.Sin(radian * (System.Math.PI / 180)) * 5f;
             //一定距離を進んだら加速してオブジェクトを消去
             if (boatGeneratingPoint + 500f < this.transform.position.z)
             {
