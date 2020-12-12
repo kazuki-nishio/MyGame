@@ -9,18 +9,6 @@ public class ObjectController : MonoBehaviour
     public float m_depth = 100f;
     /// <summary>背景となるオブジェクトを奥にいくつ並べるか</summary>
     public int m_count = 4;
-    //プレイヤーの前方何mまでアイテムを生成するか
-    public float itemGenerateRange = 80f;
-    //アイテムの生成間隔
-    public float interval = 20f;
-    //trashBagPrefabを入れる
-    public GameObject trashBagPrefab;
-    //redShrimpPrefabを入れる
-    public GameObject redShrimpPrefab;
-    //goldShrimpPrefabを入れる
-    public GameObject goldShrimpPrefab;
-    //Goalオブジェクトを入れる
-    public GameObject goal;
     /// <summary>プレイヤーのオブジェクト</summary>
     GameObject m_player = null;
     /// <summary>背景のオブジェクト（複製して複数になる）を入れておく配列</summary>
@@ -29,16 +17,19 @@ public class ObjectController : MonoBehaviour
     int index = 0;
     /// <summary>最後に背景を移動させた時のプレイヤーの位置のZ座標</summary>
     float m_lastTimeMovedBackgroundPositionZ;
-    //アイテムの生成範囲
-    private float posRangeX = 3.4f;
-    //最後にアイテムを生成した時のプレイヤーの位置のZ座標
-    float lastTimeGenerateItemPositionZ;
-    //FishinBoatPrefab
-    public GameObject fishinBoatPrefab;
-    //GoalBoatPrefab
-    public GameObject GoalBoatPrefab;
-    //FishinBoatを1つだけ生成するための変数
-    private bool isBoat = false;
+
+    public float itemGenerateRange = 80f;    //プレイヤーの前方何mまでアイテムを生成するか   
+    public float interval = 20f;//アイテムの生成間隔   
+    public GameObject trashBagPrefab;//trashBagPrefabを入れる    
+    public GameObject redShrimpPrefab;//redShrimpPrefabを入れる   
+    public GameObject goldShrimpPrefab; //goldShrimpPrefabを入れる   
+    public GameObject goal; //Goalオブジェクトを入れる    
+    private float posRangeX = 3.4f;//アイテムの生成範囲    
+    float lastTimeGenerateItemPositionZ;//最後にアイテムを生成した時のプレイヤーの位置のZ座標    
+    public GameObject fishinBoatPrefab;//FishinBoatPrefab    
+    public GameObject GoalBoatPrefab;//GoalBoatPrefab    
+    private bool isBoat = false;//FishinBoatを1つだけ生成するための変数
+
     // Start is called before the first frame update
     void Start()
     {
@@ -95,22 +86,17 @@ public class ObjectController : MonoBehaviour
         }
         //プレイヤーがアイテムの生成間隔分だけ前進したら、アイテムを生成する(ゴール以降には生成しない)
         if (lastTimeGenerateItemPositionZ + interval < m_player.transform.position.z && m_player.transform.position.z + itemGenerateRange < goal.transform.position.z)
-        {
-            //障害物の生成確立
-            int num = Random.Range(1, 8);
-            //各レーンのアイテム(shrimp）の生成確率
-            int shrimpGenerationRate;
-            //金のエビの生成確立
-            int goldShrimpGenerationRate;
-            //生成されるアイテム(shrimp)のZ軸方向のオフセット
-            int srimpOffSetZ;
-            //障害物のx軸方向のオフセット
-            int trashBagOffSetX;
+        {            
+            int num = Random.Range(1, 8);//障害物の生成確立            
+            int shrimpGenerationRate;//各レーンのアイテム(shrimp）の生成確率           
+            int goldShrimpGenerationRate; //金のエビの生成確立           
+            int srimpOffSetZ;//生成されるアイテム(shrimp)のZ軸方向のオフセット           
+            int trashBagOffSetX;//障害物のx軸方向のオフセット
             //道程の4割地点でfishinBoatを生成
             if (goal.transform.position.z * 0.39f <= m_player.transform.position.z + itemGenerateRange &&  m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.41f && !isBoat)
             {
                 GameObject boat = Instantiate(fishinBoatPrefab);
-                boat.transform.position = new Vector3(-6f, 0, m_player.transform.position.z + 100f);
+                boat.transform.position = new Vector3(-5f, 0, m_player.transform.position.z + 100f);
                 isBoat = true;
             }
             if (goal.transform.position.z * 0.79f <= m_player.transform.position.z + itemGenerateRange && m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.81f && isBoat)

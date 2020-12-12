@@ -6,82 +6,52 @@ using System;
 
 public class sardineController : MonoBehaviour
 {
-    //Sardineの移動をさせるためのコンポーネントを入れる
-    private Rigidbody myRigidBody;
-    //アニメーションするためのコンポーネントを入れる
-    private Animator myAnimator;
-    //ゲーム開始時のアニメーションのスピード
-    private float firstAnimator;
-    //加速中のアニメーションのスピード
-    private float accelAnimatorSpeed;
-    //通常時の前方向の速度
-    public float velocityZ = 15f;
-    //無敵状態の時の前方向の速度
-    public float invincibleVelocityZ = 90f;
-    //ゲーム開始時の前方向の速度
-    private float firstVelocityZ;
-    //横方向の速度
-    private float velocityX = 10f;
-    //横方向の移動範囲
-    private float moveX = 3f;
-    //加速した時の速度
-    private float accelVelocityZ = 50f;
-    //減速させる係数
-    public float decel = 0.99f;
-    //ゲームオーバーの判定
-    private bool isEnd = false;
-    //無敵状態の判定
-   [System.NonSerialized] public bool isInvincible = false;
-    //無敵状態へ移行するためのポイント
-    [System.NonSerialized] public float invinciblePoint;
-    //スコアを入れる
-   [System.NonSerialized] public float score = 0;
-    //通常時の金のエビのスコア
-    public float goldShrimpScore = 50f;
-    //通常時の赤いエビのスコア
-    public float redShrimpScore = 10f;
-    //無敵状態の金のエビのスコア
-    private float invincibleGoldShrimpScore;
-    //無敵状態の赤のエビのスコア
-    private float invincibleRedShrimpScore;
-    //コンボ
-    [System.NonSerialized] public int combo = 0;
-    //コンボボーナスポイント
-    public int comboBonusPoint = 100;
-    //ボーナスポイントのテキスト
-    private GameObject comboBonusText;
-    //コンボの累積値
-    private int accumulateCombo = 0;
-    //コリダーを入れる
-    Collider m_collider = null;
-    //スペースキー入力の有効・無効を判定するための変数
-    private bool spaceSwitch = true;
-    //BigExplosionオブジェクトを入れる
-    private GameObject bigExplosion;
+    
+    private Rigidbody myRigidBody;//Sardineの移動をさせるためのコンポーネントを入れる   
+    private Animator myAnimator;//アニメーションするためのコンポーネントを入れる   
+    private float firstAnimator;//ゲーム開始時のアニメーションのスピード    
+    private float accelAnimatorSpeed;//加速中のアニメーションのスピード   
+    public float velocityZ = 15f;//通常時の前方向の速度    
+    public float invincibleVelocityZ = 90f;//無敵状態の時の前方向の速度    
+    private float firstVelocityZ;//ゲーム開始時の前方向の速度    
+    private float velocityX = 10f;//横方向の速度   
+    private float moveX = 3f;//横方向の移動範囲   
+    private float accelVelocityZ = 50f;//加速した時の速度   
+    public float decel = 0.99f;//減速させる係数   
+    private bool isEnd = false;//ゲームオーバーの判定   
+   [System.NonSerialized] public bool isInvincible = false;//無敵状態の判定    
+   [System.NonSerialized] public float invinciblePoint;//無敵状態へ移行するためのポイント    
+   [System.NonSerialized] public float score = 0;//スコアを入れる 
+    public float goldShrimpScore = 50f;//通常時の金のエビのスコア   
+    public float redShrimpScore = 10f; //通常時の赤いエビのスコア    
+    private float invincibleGoldShrimpScore;//無敵状態の金のエビのスコア   
+    private float invincibleRedShrimpScore;//無敵状態の赤のエビのスコア    
+    [System.NonSerialized] public int combo = 0;//コンボ    
+    public int comboBonusPoint = 100;//コンボボーナスポイント   
+    private GameObject comboBonusText;//ボーナスポイントのテキスト    
+    private int accumulateCombo = 0;//コンボの累積値    
+    Collider m_collider = null;//コリダーを入れる    
+    private bool spaceSwitch = true;//スペースキー入力の有効・無効を判定するための変数    
+    private GameObject bigExplosion;//BigExplosionオブジェクトを入れる
+    public AudioClip getShrimp;//アイテム取得時の効果音
+    public AudioClip getGarbage;//障害物接触時の効果音
+    public AudioClip explode;//ゴール時の音
+    public AudioClip invincibleMusic;//無敵移行時の音
 
     // Start is called before the first frame update
     void Start()
     {
-        //BigExplosionオブジェクトを取得
-        this.bigExplosion = GameObject.Find("BigExplosion");
-        //sardineのrigidbodyコンポーネントを取得
-        this.myRigidBody = GetComponent<Rigidbody>();
-        //sardineのAnimationコンポーネントを取得
-        this.myAnimator = GetComponent<Animator>();
-        //ゲーム開始時の前方向の速度を初期化
-        firstVelocityZ = velocityZ;
-        //ゲーム開始時のアニメーションのスピードを初期化
-        firstAnimator = this.myAnimator.speed;
-        //コリダーコンポーネントを取得
-        m_collider = GetComponent<Collider>();
-        //コンボボーナステキストを取得
-        this.comboBonusText = GameObject.Find("BonusPointText");
-        //無敵状態の金のエビのスコア
-        invincibleGoldShrimpScore = goldShrimpScore * 1.1f;
-        //無敵状態の赤のエビのスコア
-        invincibleRedShrimpScore = redShrimpScore * 1.1f;
-        //加速中のアニメーションのスピード
-        this.accelAnimatorSpeed = firstAnimator + 0.6f;
+       
+        this.bigExplosion = GameObject.Find("BigExplosion"); //BigExplosionオブジェクトを取得       
+        this.myRigidBody = GetComponent<Rigidbody>(); //sardineのrigidbodyコンポーネントを取得       
+        this.myAnimator = GetComponent<Animator>();//sardineのAnimationコンポーネントを取得        
+        firstVelocityZ = velocityZ;//ゲーム開始時の前方向の速度を初期化        
+        firstAnimator = this.myAnimator.speed;//ゲーム開始時のアニメーションのスピードを初期化        
+        m_collider = GetComponent<Collider>();//コリダーコンポーネントを取得       
+        this.comboBonusText = GameObject.Find("BonusPointText"); //コンボボーナステキストを取得       
+        invincibleGoldShrimpScore = goldShrimpScore * 1.1f;//無敵状態の金のエビのスコア       
+        invincibleRedShrimpScore = redShrimpScore * 1.1f;//無敵状態の赤のエビのスコア       
+        this.accelAnimatorSpeed = firstAnimator + 0.6f;//加速中のアニメーションのスピード
     }
 
     // Update is called once per frame
@@ -90,14 +60,14 @@ public class sardineController : MonoBehaviour
         //ゲームシーン読み込みから3秒までの処理
         if (Time.timeSinceLevelLoad <= 3f)
         {
-            //プレイヤーの速度ベクトルを0に
-            this.myRigidBody.velocity = new Vector3(0, 0, 0);
+           
+            this.myRigidBody.velocity = new Vector3(0, 0, 0); //プレイヤーの速度ベクトルを0に
         }
         //3秒以降の処理
         else
         {
-            //x軸方向の速度を初期化
-            float InputVelocityX = 0;
+            
+            float InputVelocityX = 0;//x軸方向の速度を初期化
             //左矢印が押されたら左方向の速度を代入
             if (Input.GetKey(KeyCode.LeftArrow) && -this.moveX < this.transform.position.x)
             {
@@ -118,12 +88,11 @@ public class sardineController : MonoBehaviour
             }
             else if(!isEnd)
             {
-                //無敵状態のとき速度
+                //無敵状態での処理
                 if (isInvincible)
                 {
-                    this.velocityZ = invincibleVelocityZ;
-                    //無敵時に巨大化
-                    this.transform.localScale = new Vector3(20, 20, 20);
+                    this.velocityZ = invincibleVelocityZ;//無敵状態のとき速度                    
+                    this.transform.localScale = new Vector3(20, 20, 20);//無敵時に巨大化
                 }
                 //非無敵状態のときの速度
                 else if (!isInvincible)
@@ -158,8 +127,8 @@ public class sardineController : MonoBehaviour
         //障害物以外に触れたときの処理
         if (other.gameObject.tag != "ObstacleTag" && other.gameObject.tag != "GoalTag")
         {
-            //パーティクルを再生
-            GetComponent<ParticleSystem>().Play();
+            GetComponent<ParticleSystem>().Play();//パーティクルを再生                      
+            GetComponent<AudioSource>().PlayOneShot(getShrimp, 0.5f);//アイテム取得時の効果音を再生
             //コンボ数を増加
             combo++;
             accumulateCombo++;
@@ -177,27 +146,30 @@ public class sardineController : MonoBehaviour
         //非無敵状態での処理
         if (!isInvincible)
         {
-            //金のエビに触れると無敵状態へ移行
+            //金のエビに触れた場合の処理
             if (other.gameObject.tag == "InvincibleTag")
             {              
-                //得点を取得
-                score += goldShrimpScore;
-                //無敵ポイントを取得
-                invinciblePoint += 30f;               
+               
+                score += goldShrimpScore; //得点を取得              
+                invinciblePoint += 30f; //無敵ポイントを取得           
             }
-            //赤いエビに触れると得点を獲得し一定時間速度を上昇させる
-            if (other.gameObject.tag == "NormalItemTag")
+            //赤いエビに触れた場合の処理
+            else if (other.gameObject.tag == "NormalItemTag")
             {
                 score += redShrimpScore;
                 invinciblePoint += 10f;
             }
-            //障害物に触れたときの処理
-            if (other.gameObject.tag == "ObstacleTag")
+            //巨大エビに触れた際の処理
+            else if(other.gameObject.tag=="FinalItemTag")
             {
-                //コンボ数をリセット
-                combo = 0;
-                //コンボの累積値リセット
-                accumulateCombo = 0;
+                isInvincible = true;
+            }
+            //障害物に触れたときの処理
+            else if (other.gameObject.tag == "ObstacleTag")
+            {
+                GetComponent<AudioSource>().PlayOneShot(getGarbage, 0.5f);
+                combo = 0;           //コンボ数をリセット               
+                accumulateCombo = 0; //コンボの累積値リセット
                 //プレーヤーの速度を初期速度へ
                 this.velocityZ = firstVelocityZ;
                 this.myAnimator.speed = firstAnimator;
@@ -207,9 +179,11 @@ public class sardineController : MonoBehaviour
                 //オブジェクトを点滅させる
                 this.myAnimator.Play("Invincible");
             }
+
             //一定以上の無敵ポイントを取得で無敵状態へ移行
             if(100f <= invinciblePoint)
             {
+                GetComponent<AudioSource>().PlayOneShot(invincibleMusic, 0.8f);
                 isInvincible = true;
                 this.myAnimator.speed += 0.6f;
                 invinciblePoint = 0f;
@@ -245,6 +219,8 @@ public class sardineController : MonoBehaviour
             //BigExplosionを再生
             bigExplosion.transform.position = this.transform.position;
             bigExplosion.GetComponent<ParticleSystem>().Play();
+            //効果音を再生
+            GetComponent<AudioSource>().PlayOneShot(explode, 0.7f);
         }
     }
     //無敵状態を解除
