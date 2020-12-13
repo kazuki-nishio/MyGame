@@ -59,7 +59,7 @@ public class GameDirector : MonoBehaviour
             InvokeRepeating("CountDown", 0f, 1f);//スタートと同時にカウントダウン          
             this.player = GameObject.Find("Sardine"); //プレイヤーオブジェクトを取得           
             this.goal = GameObject.Find("Goal");//ゴールオブジェクトを取得          
-            this.distanceText = GameObject.Find("DistanceText"); //DistanceTextを取得           
+            //this.distanceText = GameObject.Find("DistanceText"); //DistanceTextを取得           
             this.goalText = GameObject.Find("GoalText");//GoalTextを取得           
             this.timerText = GameObject.Find("TimerText");//Timertextを取得          
             this.scoreText = GameObject.Find("ScoreText"); //Scoretextを取得          
@@ -131,13 +131,13 @@ public class GameDirector : MonoBehaviour
             if (3 < Time.timeSinceLevelLoad)
             {
                 this.score = player.GetComponent<sardineController>().score; //スコアを取得               
-                this.toGoal = goal.transform.position.z - player.transform.position.z; //プレーヤーとゴールまでの位置を計算                
+                //this.toGoal = goal.transform.position.z - player.transform.position.z; //プレーヤーとゴールまでの位置を計算                
                 distanceGage.value = player.transform.position.z / goal.transform.position.z;//プレーヤーの進行度をゲージに表示
                 //ゴールまでの距離をDistanceTextに表示
-                if (0 <= toGoal)
+                /*if (0 <= toGoal)
                 {
                     distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
-                }
+                }*/
                 //ゴール後の処理
                 if (isGoal)
                 {

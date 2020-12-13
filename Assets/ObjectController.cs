@@ -79,7 +79,7 @@ public class ObjectController : MonoBehaviour
     void Update()
     {
         // プレイヤーが背景の奥行の分だけ前進したら、一番後ろの背景を最も前方に移動させる
-        if (m_lastTimeMovedBackgroundPositionZ + m_depth < m_player.transform.position.z)
+        if (m_lastTimeMovedBackgroundPositionZ + m_depth < m_player.transform.position.z && m_player.transform.position.z < goal.transform.position.z)
         {
             m_backgroundObjects[index].transform.position += Vector3.forward * m_depth * m_count;
             m_lastTimeMovedBackgroundPositionZ = m_player.transform.position.z;
