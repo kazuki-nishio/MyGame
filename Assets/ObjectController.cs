@@ -17,18 +17,19 @@ public class ObjectController : MonoBehaviour
     int index = 0;
     /// <summary>最後に背景を移動させた時のプレイヤーの位置のZ座標</summary>
     float m_lastTimeMovedBackgroundPositionZ;
-
     public float itemGenerateRange = 80f;    //プレイヤーの前方何mまでアイテムを生成するか   
     public float interval = 20f;//アイテムの生成間隔   
     public GameObject trashBagPrefab;//trashBagPrefabを入れる    
     public GameObject redShrimpPrefab;//redShrimpPrefabを入れる   
     public GameObject goldShrimpPrefab; //goldShrimpPrefabを入れる   
+    public GameObject finalShrimpPrefab;//finalShrimpPrefabを入れる
     public GameObject goal; //Goalオブジェクトを入れる    
     private float posRangeX = 3.4f;//アイテムの生成範囲    
     float lastTimeGenerateItemPositionZ;//最後にアイテムを生成した時のプレイヤーの位置のZ座標    
     public GameObject fishinBoatPrefab;//FishinBoatPrefab    
     public GameObject GoalBoatPrefab;//GoalBoatPrefab    
     private bool isBoat = false;//FishinBoatを1つだけ生成するための変数
+    private bool isShrimp = false;//FinalShrimpを1つだけ生成するための変数
 
     // Start is called before the first frame update
     void Start()
@@ -52,7 +53,7 @@ public class ObjectController : MonoBehaviour
         {
             int num = Random.Range(1, 7);
             //障害物（ゴミ袋）を生成
-            if (num <=3)
+            if (num <= 3)
             {
                 GameObject cube = Instantiate(trashBagPrefab);
                 cube.transform.position = new Vector3(-3, cube.transform.position.y, i);
@@ -86,19 +87,20 @@ public class ObjectController : MonoBehaviour
         }
         //プレイヤーがアイテムの生成間隔分だけ前進したら、アイテムを生成する(ゴール以降には生成しない)
         if (lastTimeGenerateItemPositionZ + interval < m_player.transform.position.z && m_player.transform.position.z + itemGenerateRange < goal.transform.position.z)
-        {            
+        {
             int num = Random.Range(1, 8);//障害物の生成確立            
             int shrimpGenerationRate;//各レーンのアイテム(shrimp）の生成確率           
             int goldShrimpGenerationRate; //金のエビの生成確立           
             int srimpOffSetZ;//生成されるアイテム(shrimp)のZ軸方向のオフセット           
             int trashBagOffSetX;//障害物のx軸方向のオフセット
             //道程の4割地点でfishinBoatを生成
-            if (goal.transform.position.z * 0.39f <= m_player.transform.position.z + itemGenerateRange &&  m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.41f && !isBoat)
+            if (goal.transform.position.z * 0.39f <= m_player.transform.position.z + itemGenerateRange && m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.41f && !isBoat)
             {
                 GameObject boat = Instantiate(fishinBoatPrefab);
                 boat.transform.position = new Vector3(-5f, 0, m_player.transform.position.z + 100f);
                 isBoat = true;
             }
+            //ゴール地点にfishinBoatを生成
             if (goal.transform.position.z * 0.79f <= m_player.transform.position.z + itemGenerateRange && m_player.transform.position.z + itemGenerateRange <= goal.transform.position.z * 0.81f && isBoat)
             {
                 GameObject boat = Instantiate(GoalBoatPrefab);
@@ -125,31 +127,28 @@ public class ObjectController : MonoBehaviour
                     {
                         //金のエビの生成
                         goldShrimpGenerationRate = Random.Range(1, 6);
-                        if(goldShrimpGenerationRate <= 2)
+                        if (goldShrimpGenerationRate <= 2)
                         {
                             GameObject goldSrimp = Instantiate(goldShrimpPrefab);
                             goldSrimp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + srimpOffSetZ);
                         }
                         //赤いエビ生成
-                        else if(2 < goldShrimpGenerationRate)
+                        else if (2 < goldShrimpGenerationRate)
                         {
                             GameObject redShrimp = Instantiate(redShrimpPrefab);
                             redShrimp.transform.position = new Vector3(posRangeX * j, 1, m_player.transform.position.z + itemGenerateRange + srimpOffSetZ);
-                        }                     
+                        }
                     }
                 }
             }
             //コースの80%～ゴールまでのアイテム生成
-            else if (goal.transform.position.z * 0.8 < m_player.transform.position.z + itemGenerateRange)
+            else if (goal.transform.position.z * 0.8 < m_player.transform.position.z + itemGenerateRange && !isShrimp)
             {
-                for(int i = 0;i < 5;i++)
-                {
-                    GameObject finalShrimp = Instantiate(goldShrimpPrefab);
-                    finalShrimp.transform.localScale = new Vector3(3, 3, 3);
-                    finalShrimp.transform.position = new Vector3(0, 3f, goal.transform.position.z * 0.9f);
-                }                
+                GameObject finalShrimp = Instantiate(finalShrimpPrefab);
+                finalShrimp.transform.position = new Vector3(0, 3f, goal.transform.position.z * 0.9f);
+                isShrimp = true;
             }
-            lastTimeGenerateItemPositionZ = m_player.transform.position.z;
+            lastTimeGenerateItemPositionZ = m_player.transform.position.z;//最後にアイテムを生成した地点を更新
         }
     }
 }

@@ -7,7 +7,7 @@ using System;
 public class GameDirector : MonoBehaviour
 {
     //チュートリアルシーンで使用する変数
-    [SerializeField]GameObject[] tutorialPanel = null;//チュートリアル用のパネルを入れる配列
+    [SerializeField] GameObject[] tutorialPanel = null;//チュートリアル用のパネルを入れる配列
     private int count = 0;//配列の添え字
 
     // ゲームシーンで使用する変数
@@ -52,10 +52,10 @@ public class GameDirector : MonoBehaviour
     void Start()
     {
         //デリゲートを登録
-        SceneManager.sceneLoaded += ResultGameSceneLoded;     
+        SceneManager.sceneLoaded += ResultGameSceneLoded;
         //ゲームシーンでの処理
         if (SceneManager.GetActiveScene().name == "GameScene")
-        {           
+        {
             InvokeRepeating("CountDown", 0f, 1f);//スタートと同時にカウントダウン          
             this.player = GameObject.Find("Sardine"); //プレイヤーオブジェクトを取得           
             this.goal = GameObject.Find("Goal");//ゴールオブジェクトを取得          
@@ -77,8 +77,8 @@ public class GameDirector : MonoBehaviour
         {
             this.totalScore = this.finalScore + (this.finishTime * 10f);//トータルスコア取得
             bestScore = PlayerPrefs.GetFloat("RecordedScore");//ベストスコアを取得
-            BestScoreText.GetComponent<Text>().text = "Best：" + bestScore.ToString("F0") + "pt";
-            //if (bestScore < totalScore)
+            BestScoreText.GetComponent<Text>().text = "Best:" + bestScore.ToString("F0") + "pt";
+            if (bestScore < totalScore)
             {
                 PlayerPrefs.SetFloat("RecordedScore", totalScore);
                 this.particleObject = GameObject.FindGameObjectsWithTag("ParticleTag");
@@ -86,7 +86,7 @@ public class GameDirector : MonoBehaviour
             //各種得点のUIを順番に表示
             StartCoroutine(DelayMethod(1f, () =>
             {
-                resultScoreText.GetComponent<Text>().text = "Score：" + this.finalScore.ToString() + " pt";
+                resultScoreText.GetComponent<Text>().text = "Score:" + this.finalScore.ToString() + " pt";
                 GetComponent<AudioSource>().PlayOneShot(ResultTextMusic, 0.5f);//効果音を再生
                 StartCoroutine(DelayMethod(1f, () =>
                 {
@@ -113,7 +113,7 @@ public class GameDirector : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "TutorialScene")
         {
             tutorialPanel[count].SetActive(true);
-            if (Input.GetKeyDown(KeyCode.RightArrow) && count < tutorialPanel.Length-1)
+            if (Input.GetKeyDown(KeyCode.RightArrow) && count < tutorialPanel.Length - 1)
             {
                 count++;
                 tutorialPanel[count - 1].SetActive(false);
@@ -122,7 +122,7 @@ public class GameDirector : MonoBehaviour
             {
                 count--;
                 tutorialPanel[count + 1].SetActive(false);
-            }        
+            }
         }
         //ゲームシーンでの処理
         if (SceneManager.GetActiveScene().name == "GameScene")
@@ -130,13 +130,12 @@ public class GameDirector : MonoBehaviour
             //ゲームシーン開始3秒以降の処理
             if (3 < Time.timeSinceLevelLoad)
             {
-               
                 this.score = player.GetComponent<sardineController>().score; //スコアを取得               
                 this.toGoal = goal.transform.position.z - player.transform.position.z; //プレーヤーとゴールまでの位置を計算                
                 distanceGage.value = player.transform.position.z / goal.transform.position.z;//プレーヤーの進行度をゲージに表示
                 //ゴールまでの距離をDistanceTextに表示
                 if (0 <= toGoal)
-                {                    
+                {
                     distanceText.GetComponent<Text>().text = "ゴールまで：" + toGoal.ToString("F0") + "m";
                 }
                 //ゴール後の処理
@@ -158,7 +157,6 @@ public class GameDirector : MonoBehaviour
                 {
                     second -= Time.deltaTime;
                 }
-               
                 timerText.GetComponent<Text>().text = "Time" + this.second.ToString("F2") + "sec"; //経過時間を表示               
                 scoreText.GetComponent<Text>().text = "Score:" + score.ToString() + "pt";//スコアを表示               
                 comboText.GetComponent<Text>().text = player.GetComponent<sardineController>().combo.ToString() + "combo"; //コンボ数を表示
@@ -198,17 +196,17 @@ public class GameDirector : MonoBehaviour
     {
         GetComponent<AudioSource>().PlayOneShot(buttonClickSound, 0.3f);//効果音を鳴らす
         //ゲームシーンを読み込む
-        if (button.gameObject.tag=="GameSceneTag")
+        if (button.gameObject.tag == "GameSceneTag")
         {
             SceneManager.LoadScene("GameScene");
         }
         //チュートリアルシーンを読み込む
-        else if(button.gameObject.tag=="TutorialSceneTag")
+        else if (button.gameObject.tag == "TutorialSceneTag")
         {
             SceneManager.LoadScene("TutorialScene");
         }
         //タイトルシーンを読み込む
-        else if(button.gameObject.tag=="TitleSceneTag")
+        else if (button.gameObject.tag == "TitleSceneTag")
         {
             SceneManager.LoadScene("TitleScene");
         }
@@ -223,10 +221,10 @@ public class GameDirector : MonoBehaviour
     //各種得点を表示するコルーチン
     IEnumerator IndicateScore()
     {
-        timeScoreText.GetComponent<Text>().text = "Time：" + finishTime.ToString("F1") + "×10 = " + (this.finishTime * 10f).ToString("F0") + " pt";
+        timeScoreText.GetComponent<Text>().text = "Time:" + finishTime.ToString("F1") + "×10 = " + (this.finishTime * 10f).ToString("F0") + " pt";
         GetComponent<AudioSource>().PlayOneShot(ResultTextMusic, 0.5f);//効果音を再生
         yield return new WaitForSeconds(1f);
-        totalScoreText.GetComponent<Text>().text = "Total：" + totalScore.ToString("F0") + " pt";
+        totalScoreText.GetComponent<Text>().text = "Total:" + totalScore.ToString("F0") + " pt";
         GetComponent<AudioSource>().PlayOneShot(ResultTextMusic, 0.5f);//効果音を再生
         //ハイスコアならニューレコードテキストを表示し、パーティクルを再生
         if (bestScore < totalScore)

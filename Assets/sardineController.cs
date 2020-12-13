@@ -6,7 +6,6 @@ using System;
 
 public class sardineController : MonoBehaviour
 {
-    
     private Rigidbody myRigidBody;//Sardineの移動をさせるためのコンポーネントを入れる   
     private Animator myAnimator;//アニメーションするためのコンポーネントを入れる   
     private float firstAnimator;//ゲーム開始時のアニメーションのスピード    
@@ -19,11 +18,12 @@ public class sardineController : MonoBehaviour
     private float accelVelocityZ = 50f;//加速した時の速度   
     public float decel = 0.99f;//減速させる係数   
     private bool isEnd = false;//ゲームオーバーの判定   
-   [System.NonSerialized] public bool isInvincible = false;//無敵状態の判定    
-   [System.NonSerialized] public float invinciblePoint;//無敵状態へ移行するためのポイント    
-   [System.NonSerialized] public float score = 0;//スコアを入れる 
-    public float goldShrimpScore = 50f;//通常時の金のエビのスコア   
-    public float redShrimpScore = 10f; //通常時の赤いエビのスコア    
+    [System.NonSerialized] public bool isInvincible = false;//無敵状態の判定    
+    [System.NonSerialized] public float invinciblePoint;//無敵状態へ移行するためのポイント    
+    [System.NonSerialized] public float score = 0;//スコアを入れる 
+    private float goldShrimpScore = 50f;//通常時の金のエビのスコア   
+    private float redShrimpScore = 10f; //通常時の赤いエビのスコア  
+    private float finalShrimpScore = 500f;
     private float invincibleGoldShrimpScore;//無敵状態の金のエビのスコア   
     private float invincibleRedShrimpScore;//無敵状態の赤のエビのスコア    
     [System.NonSerialized] public int combo = 0;//コンボ    
@@ -41,7 +41,6 @@ public class sardineController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
         this.bigExplosion = GameObject.Find("BigExplosion"); //BigExplosionオブジェクトを取得       
         this.myRigidBody = GetComponent<Rigidbody>(); //sardineのrigidbodyコンポーネントを取得       
         this.myAnimator = GetComponent<Animator>();//sardineのAnimationコンポーネントを取得        
@@ -60,13 +59,11 @@ public class sardineController : MonoBehaviour
         //ゲームシーン読み込みから3秒までの処理
         if (Time.timeSinceLevelLoad <= 3f)
         {
-           
             this.myRigidBody.velocity = new Vector3(0, 0, 0); //プレイヤーの速度ベクトルを0に
         }
         //3秒以降の処理
         else
         {
-            
             float InputVelocityX = 0;//x軸方向の速度を初期化
             //左矢印が押されたら左方向の速度を代入
             if (Input.GetKey(KeyCode.LeftArrow) && -this.moveX < this.transform.position.x)
@@ -80,13 +77,13 @@ public class sardineController : MonoBehaviour
             }
             //クリア時に減速
             if (isEnd)
-            {              
+            {
                 this.velocityX *= decel;
                 this.velocityZ *= decel;
                 this.invincibleVelocityZ *= decel;
                 this.myAnimator.speed *= decel;
             }
-            else if(!isEnd)
+            else if (!isEnd)
             {
                 //無敵状態での処理
                 if (isInvincible)
@@ -116,7 +113,7 @@ public class sardineController : MonoBehaviour
                         this.myAnimator.speed = firstAnimator;
                     }
                 }
-            }            
+            }
             //Sardineの速度を設定
             this.myRigidBody.velocity = new Vector3(InputVelocityX, 0, this.velocityZ);
         }
@@ -148,8 +145,8 @@ public class sardineController : MonoBehaviour
         {
             //金のエビに触れた場合の処理
             if (other.gameObject.tag == "InvincibleTag")
-            {              
-               
+            {
+
                 score += goldShrimpScore; //得点を取得              
                 invinciblePoint += 30f; //無敵ポイントを取得           
             }
@@ -160,9 +157,11 @@ public class sardineController : MonoBehaviour
                 invinciblePoint += 10f;
             }
             //巨大エビに触れた際の処理
-            else if(other.gameObject.tag=="FinalItemTag")
+            else if (other.gameObject.tag == "FinalItemTag")
             {
+                score += finalShrimpScore;
                 isInvincible = true;
+                GetComponent<AudioSource>().PlayOneShot(invincibleMusic, 0.5f);
             }
             //障害物に触れたときの処理
             else if (other.gameObject.tag == "ObstacleTag")
@@ -181,19 +180,18 @@ public class sardineController : MonoBehaviour
             }
 
             //一定以上の無敵ポイントを取得で無敵状態へ移行
-            if(100f <= invinciblePoint)
+            if (100f <= invinciblePoint)
             {
                 GetComponent<AudioSource>().PlayOneShot(invincibleMusic, 0.8f);
                 isInvincible = true;
                 this.myAnimator.speed += 0.6f;
                 invinciblePoint = 0f;
-                //5秒後に解除
-                Invoke("UnInvincible", 8f);
+                Invoke("UnInvincible", 8f);//8秒後に解除
             }
         }
         //無敵時の処理
         else if (isInvincible)
-        {    
+        {
             //獲得得点を上昇
             if (other.gameObject.tag == "InvincibleTag")
             {
